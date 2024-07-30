@@ -94,6 +94,7 @@ function ReadFileFromGithub(fileName, debug)
 end
 
 function LoadFiles(debug)
+	--loading and executing all LUA files
 	ReadFileFromGithub("ScreenFunctions.lua", debug)	
 	ReadFileFromGithub("globalVariables.lua", debug)
 	ReadFileFromGithub("ScreenFunctions.lua", debug)
