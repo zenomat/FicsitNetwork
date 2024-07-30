@@ -4,8 +4,7 @@ function PrintDebugInfo(message, debug)
 	end
 end
 
-function Initialization(debug)			
-	
+function Initialization(debug)				
 	softwareVersion = 2.0
 	port = 1118
 	print("Software Version: " .. tostring(softwareVersion))
@@ -17,7 +16,7 @@ function Initialization(debug)
 	man1 = component.proxy(component.findComponent("Man1")[1])
 	man2 = component.proxy(component.findComponent("Man2")[1])
 	man3 = component.proxy(component.findComponent("Man3")[1])
-	PrintDebugInfo("Man1: " .. tostring(man1) .. " ; Man2: " .. tostring(man2) .. " ; Man1: " .. tostring(man3))
+	PrintDebugInfo("Man1: " .. tostring(man1) .. " ; Man2: " .. tostring(man2) .. " ; Man1: " .. tostring(man3), debug)
 
 	-- Storage 
 	PrintDebugInfo("Storage info:", debug)
@@ -34,7 +33,7 @@ function Initialization(debug)
 	numberOfContainers = 4
 
 	-- Power switch
-	PrintDebugInfo("Power switch")
+	PrintDebugInfo("Power switch", debug)
 
 	switch = component.proxy(component.findComponent("PowerSwitch")[1])
 	PrintDebugInfo("switch: " .. tostring(switch), debug)
@@ -43,26 +42,23 @@ function Initialization(debug)
 	PrintDebugInfo("Screen and panel")
 	gpu = computer.getPCIDevices(classes.GPUT1)[1]
 	screen = component.proxy(component.findComponent("Screen1")[1])
-
 	PrintDebugInfo("GPU: " .. tostring(gpu) .. "; Screen: " .. tostring(screen), debug)
 
 	panel = component.proxy(component.findComponent("Panel1")[1])
 	led = panel:getModule(0, 0)
 	debugSwitch = panel:getModule(2, 0)
-
 	PrintDebugInfo("Panel: " .. tostring(panel), debug)
 
 	-- Sign post
 	labelSign = component.proxy(component.findComponent("LabelSign"))
 	PrintDebugInfo("LabelSign text: " .. labelSign[1]:getPrefabSignData():getTextElement( "Name" ), debug)
 
-
 	-- Network High Speed connector:
 	receiverNetCard = "0F346D564E2140140DEE9BADA902DAD6" -- server network card
 	netcard = component.proxy(component.findComponent("NetCard")[1])
 	netcard:open(port)
 
-	PrintDebugInfo("netcard: " .. tostring(netcard, debug)
+	PrintDebugInfo("netcard: " .. tostring(netcard), debug)
 	print("Port: " .. tostring(port))
 
 	-- Check Recipe
