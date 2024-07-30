@@ -94,5 +94,15 @@ function ReadFileFromGithub(fileName, debug)
 end
 
 function LoadFiles(debug)
-	ReadFileFromGithub("ScreenFunctions.lua", debug)
+	ReadFileFromGithub("ScreenFunctions.lua", debug)	
+	ReadFileFromGithub("//initComponents.lua", debug)
+	ReadFileFromGithub("//globalVariables.lua", debug)
+	ReadFileFromGithub("//ScreenFunctions.lua", debug)
+	ReadFileFromGithub("//CreateBom.lua", debug)
+	ReadFileFromGithub("//StorageInfo.lua", debug)
+	ReadFileFromGithub("//EnoughRawInMan.lua", debug)
+	ReadFileFromGithub("//WokingConditions.lua", debug)
+	ReadFileFromGithub("//NetSend.lua", debug)
+	ReadFileFromGithub("//ScreenTimeout.lua", debug)
+	ReadFileFromGithub("//FinishedGoodsStorage.lua", debug)
 end
