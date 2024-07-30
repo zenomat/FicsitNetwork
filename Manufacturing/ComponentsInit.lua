@@ -4,10 +4,11 @@ function PrintDebugInfo(message, debug)
 	end
 end
 
-function Initialization(debug)				
+function Initialization(debug, clientPort)				
 	softwareVersion = 2.0
-	port = 1118
+	port = clientPort
 	print("Software Version: " .. tostring(softwareVersion))
+	print("Opening Port: " .. tostring(port))
 	
 	PrintDebugInfo("Running intializatiation", debug)
 	PrintDebugInfo("Manufacturing machines", debug)
@@ -58,8 +59,7 @@ function Initialization(debug)
 	netcard = component.proxy(component.findComponent("NetCard")[1])
 	netcard:open(port)
 
-	PrintDebugInfo("netcard: " .. tostring(netcard), debug)
-	print("Port: " .. tostring(port))
+	PrintDebugInfo("netcard: " .. tostring(netcard), debug)	
 
 	-- Check Recipe
 	if (man1:getRecipe() == nil or man2:getRecipe() == nil or man3:getRecipe() == nil) then 
