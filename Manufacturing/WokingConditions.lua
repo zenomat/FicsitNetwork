@@ -41,7 +41,7 @@ function StatusCheck()
 			SetPower(false, "STOPPED!! Not enough material in machines!!  ", "red", "Empty")	
 		end	
 		
-		if (oneMachineHasEnough) then
+		if (oneMachineHasNotEnough) then
 			-- if one machine has enough raw materials, start production
 			SetPower(true, "RUNNING !!Low on raw materials               ", "yellow", "Low")
 		end
