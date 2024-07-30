@@ -4,12 +4,12 @@ function PrintDebugInfo(message)
 	end
 end
 
-function Initialization()
+function Initialization(debug)
 	softwareVersion = 2.0
 	port = 1118
 	print("Software Version: " .. tostring(softwareVersion))
 
-	setupDebug = false
+	setupDebug = debug
 
 	PrintDebugInfo("Running intializatiation")
 	PrintDebugInfo("Manufacturing machines")
