@@ -78,3 +78,23 @@ function Initialization(debug)
 	print("Screen size : " .. w, h)
 end
 
+function ReadFileFromGithub(fileName)
+	-- get library from internet
+	local req = card:request("https://raw.githubusercontent.com/zenomat/FicsitNetwork/main/Manufacturing/" .. fileName, "GET", "")
+	local _, libdata = req:await()
+
+	-- save library to filesystem
+	filesystem.initFileSystem("/dev")
+	filesystem.makeFileSystem("tmpfs", "tmp")
+	filesystem.mount("/dev/tmp","/")
+	local file = filesystem.open(fileName, "w")
+	file:write(libdata)
+	file:close()
+
+	-- load the library from the file system and use it
+	local json = filesystem.doFile(Initialization.lua)
+end
+
+function LoadFiles()
+	ReadFileFromGithub("ScreenFunctions.lua")
+end
