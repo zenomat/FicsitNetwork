@@ -94,7 +94,7 @@ function ReadFileFromGithub(fileName, debug)
 end
 
 function LoadFiles(debug)
-	ReadFileFromGithub("reenFunctions.lua", debug)	
+	ReadFileFromGithub("ScreenFunctions.lua", debug)	
 	ReadFileFromGithub("globalVariables.lua", debug)
 	ReadFileFromGithub("ScreenFunctions.lua", debug)
 	ReadFileFromGithub("CreateBom.lua", debug)
