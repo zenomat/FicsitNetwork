@@ -106,4 +106,5 @@ function LoadFiles(debug)
 	ReadFileFromGithub("ScreenTimeout.lua", debug)
 	ReadFileFromGithub("FinishedGoodsStorage.lua", debug)
 	ReadFileFromGithub("ReportLowRaw.lua", debug)
+	ReadFileFromGithub("MainLoop.lua", debug)
 end
