@@ -105,5 +105,5 @@ function LoadFiles(debug)
 	ReadFileFromGithub("NetSend.lua", debug)
 	ReadFileFromGithub("ScreenTimeout.lua", debug)
 	ReadFileFromGithub("FinishedGoodsStorage.lua", debug)
-	ReadFileFromGithub("//ReportLowRaw.lua", debug)
+	ReadFileFromGithub("ReportLowRaw.lua", debug)
 end
