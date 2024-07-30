@@ -4,13 +4,11 @@ function PrintDebugInfo(message)
 	end
 end
 
-function Initialization(debug)
+function Initialization(setupDebug)
 	softwareVersion = 2.0
 	port = 1118
 	print("Software Version: " .. tostring(softwareVersion))
-
-	setupDebug = debug
-
+	
 	PrintDebugInfo("Running intializatiation")
 	PrintDebugInfo("Manufacturing machines")
 
@@ -78,8 +76,10 @@ function Initialization(debug)
 	print("Screen size : " .. w, h)
 end
 
-function ReadFileFromGithub(fileName)
+function ReadFileFromGithub(fileName, debug)
 	-- get library from internet
+	PrintDebugInfo("Loading file: " .. fileName)
+	
 	local req = card:request("https://raw.githubusercontent.com/zenomat/FicsitNetwork/main/Manufacturing/" .. fileName, "GET", "")
 	local _, libdata = req:await()
 
@@ -92,9 +92,10 @@ function ReadFileFromGithub(fileName)
 	file:close()
 
 	-- load the library from the file system and use it
-	local json = filesystem.doFile(Initialization.lua)
+	local json = filesystem.doFile(fileName)
+	PrintDebugInfo("File loaded successfully: " .. fileName)
 end
 
-function LoadFiles()
-	ReadFileFromGithub("ScreenFunctions.lua")
+function LoadFiles(debug)
+	ReadFileFromGithub("ScreenFunctions.lua", debug)
 end
