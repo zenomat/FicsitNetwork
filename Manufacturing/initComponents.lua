@@ -1,10 +1,14 @@
+local setupDebug = false
+
 function PrintDebugInfo(message)
 	if (setupDebug == true) then
 		print(message)
 	end
 end
 
-function Initialization(setupDebug)
+function Initialization(debug)	
+	setupDebug = debug
+	
 	softwareVersion = 2.0
 	port = 1118
 	print("Software Version: " .. tostring(softwareVersion))
@@ -77,6 +81,7 @@ function Initialization(setupDebug)
 end
 
 function ReadFileFromGithub(fileName, debug)
+	setupDebug = debug
 	-- get library from internet
 	PrintDebugInfo("Loading file: " .. fileName)
 	
