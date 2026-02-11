@@ -1,0 +1,14 @@
+netcard = component.proxy(component.findComponent("NetCard")[1])
+netcard:open(1111)
+
+event.listen(netcard)
+
+while true do 
+	e, s, sender, port, message = event.pull(1)
+	
+	if e == "NetworkMessage" then
+		print("Sender:" .. sender)
+		print("Port:" .. port)
+		print("Message:" .. message)		
+	end
+end

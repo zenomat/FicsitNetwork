@@ -1,0 +1,28 @@
+-- Client side
+
+receiverNetCard = "4F42FDEB4D29C83CB97EFF8F122814F9" -- server network card
+
+port = 3000
+
+netcard = component.proxy(component.findComponent("NetCard")[1])
+netcard:open(3000)
+netcard:open(1500)
+
+while true do
+	event.listen(netcard)
+
+	e, s, sender, port, message = event.pull(5)
+
+	print(e)
+	
+	--
+	
+	if (e == "NetworkMessage" and message == "SendData") then
+		print("Sender:" .. sender)
+		print("Port:" .. port)
+		print("Message:" .. message)		
+		
+		netcard:send(receiverNetCard, 3000, "hello world")
+	end	
+
+end

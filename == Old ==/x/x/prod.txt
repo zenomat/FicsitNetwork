@@ -1,0 +1,7 @@
+ref 1 - bauxite + water ->  aluminium solution + sillica
+				
+ref 2 - aluminium solution + coal -> alum scrap + water
+
+foundry - alum scrap + sillica -> alum ignot
+
+assemb - alum ignot + copper ignot -> alclad alum sheet

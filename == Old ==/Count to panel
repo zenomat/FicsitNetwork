@@ -1,0 +1,34 @@
+panel = component.proxy("C22D788242DE43FBF1FE5DA8777203C2")
+
+-- set color red on button
+module = panel:getModule(0, 0, 0)
+module:setColor(1, 0, 0 , 1)
+
+module1 = panel:getModule(0, 1, 0)
+module1:setColor(0, 1, 0, 1)
+
+module2 = panel:getModule(1, 0, 0)
+print(module2)
+
+containers = component.proxy(component.findComponent("Storage1"))
+containerInvs = {}
+
+function ItemCount()
+  value = 0
+  for _,container in pairs(containers) do
+    containerInvs[container] = container:getInventories()[1]
+    value = (containerInvs[container].ItemCount)
+  end
+  
+  return value 
+end
+
+
+while true do
+
+ count = ItemCount()
+ module2.text = tostring(count)
+ module2.size = 100
+
+
+end

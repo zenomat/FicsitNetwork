@@ -6,13 +6,16 @@ function CreateBomMatrix(manufacturer)
 	ShowMsg(5, 3, "Ingridients:")
 	whatAreWeProducing = man1:getRecipe().name
 	
+	numberOfContainers = 0
+	
 	for i, ingredient in ipairs(ingredients) do		
 		ShowMsg(5, posy, ingredient.type.name .. " - Quantity: " .. ingredient.amount)
 		posy = posy + 1
 		-- create ingridient matrix
 		bomMatrix[i] = {ingredient.type.name, ingredient.amount}
 		i = i + 1;
+		numberOfContainers = numberOfContainers + 1
 	end
-	
+					
 	gpu:flush()
 end

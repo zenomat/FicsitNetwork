@@ -1,0 +1,13 @@
+-- Client side
+
+receiverNetCard = "D93EBF994447118AEACAD687CC883780" -- server network card
+
+port = 1111
+
+netcard = component.proxy(component.findComponent("NetCard")[1])
+netcard:open(port)
+
+while true do
+	netcard:send(receiverNetCard, port, "hello world")
+	event.pull(1)	
+end

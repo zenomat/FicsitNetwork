@@ -1,0 +1,12 @@
+-- changes the text on a Label Sign called Display1
+
+sign = component.proxy(component.findComponent("Display1"))
+print(sign[1]:getPrefabSignData():getTextElement( "Name" ))
+
+signData = sign[1]:getPrefabSignData() --Gets the SignData Object
+signData:setTextElement( "Name" , "Meep" ) -- Changes the name of the Signdata
+sign[1]:setPrefabSignData(signData) -- Assigns changed Signdata to Sign (this is the step you were missing)
+event.pull(0.01) --Without delay sign text will still change but print will still give old Name
+
+print(sign[1]:getPrefabSignData():getTextElement( "Name" )) -- Should now be Meep
+

@@ -1,0 +1,164 @@
+--Server Network Card
+receiver = "4A2F80DB4F2F8B61028AC6AF35C2A273"
+port = 1111
+
+--Card located in this computer
+netcard = component.proxy("2BBE2EC243E2C0FFC904AD8041944CBD") 
+netcard:open(port)
+
+--Panel Config
+panel = component.proxy("0F99EC704F6750ABF248EFBCAD8CC6F8")
+scr1 = panel:getModule(0, 9, 0)
+scr2 = panel:getModule(8, 9, 0)
+
+scr3 = panel:getModule(0, 7, 0)
+scr4 = panel:getModule(8, 7, 0)
+
+-- get first T1 GPU avialable from PCI-Interface
+local gpu = computer.getPCIDevices(findClass("GPUT1"))[1]
+if not gpu then
+ error("No GPU T1 found!")
+end
+
+-- get first Screen-Driver available from PCI-Interface
+--local screen = computer.getPCIDevices(findClass("FINComputerScreen"))[1]
+-- if no scren found, try to find large screen from component network
+if not screen then
+ local comp = component.findComponent(findClass("Screen"))[1]
+ if not comp then
+  error("No Screen found!")
+ end
+ screen = component.proxy(comp)
+end
+
+-- setup gpu
+gpu:bindScreen(screen)
+w,h = gpu:getSize()
+
+print(w, h)
+
+-- clean screen
+gpu:setBackground(0,0,0,0)
+gpu:fill(0,0,w,h," ")
+
+fluid1 = component.proxy(component.findComponent("Fluid1"))
+fluid2 = component.proxy(component.findComponent("Fluid2"))
+fluid3 = component.proxy(component.findComponent("Fluid3"))
+
+fluid4 = component.proxy(component.findComponent("Fluid4"))
+fluid5 = component.proxy(component.findComponent("Fluid5"))
+fluid6 = component.proxy(component.findComponent("Fluid6"))
+
+fluid7 = component.proxy(component.findComponent("Fluid7"))
+fluid8 = component.proxy(component.findComponent("Fluid8"))
+fluid9 = component.proxy(component.findComponent("Fluid9"))
+
+fluid10 = component.proxy(component.findComponent("Water1"))
+fluid11 = component.proxy(component.findComponent("Water2"))
+fluid12 = component.proxy(component.findComponent("Water3"))
+fluid13 = component.proxy(component.findComponent("Water4"))
+
+cont1 = component.proxy(component.findComponent("Container1"))
+cont2 = component.proxy(component.findComponent("Container2"))
+cont3 = component.proxy(component.findComponent("Container3"))
+cont4 = component.proxy(component.findComponent("Container4"))
+
+containerInvs = {}
+
+function FluidCount(fluidIndex, flushAllowed)
+  count = 0
+  for _,container in pairs(fluidIndex) do
+      containerInvs[container] = container:getFluidType()
+      count = container.fluidContent     
+
+      if (count > 2000 and flushAllowed == 1) then
+        container:flush()
+      end
+
+  end
+  return count
+end
+
+function Display(fluidTank, posY)
+ level = FluidCount(fluidTank, 0)
+ x = level * 100 / 2400 
+ gpu:setText(0, posY, "Tank " .. posY .. ": " .. string.format("%.2f",level) .. " / 2400" .. " -> " .. string.format("%.2f",x) .. "%")
+
+ return level
+end
+
+function ShowWaterTank(waterTank, posY, label)
+ level = FluidCount(waterTank, 1)
+ gpu:setText(60, posY, "Water tank " .. posY .. ": " .. string.format("%.2f",level))
+end
+
+function ShowContainerInfo(containerName, posY, index)
+  value = 0
+  for _,container in pairs(containerName) do
+    containerInvs[container] = container:getInventories()[1]
+    value = (containerInvs[container].ItemCount)
+  end
+  
+  gpu:setText(0, posY, "Container " .. index .. ": " .. value .. " items / 4800")
+
+  return value 
+end
+
+function InitScreen(screen)
+  screen.size = 100
+  screen.text = "Scr"
+end
+
+InitScreen(scr1)
+InitScreen(scr2)
+InitScreen(scr3)
+InitScreen(scr4)
+
+
+while true do
+ event.pull(2)
+ gpu:setText(0, 0, "Cooling fluid stats") 
+
+ x1 = Display(fluid1, 1)
+ x2 = Display(fluid2, 2)
+ x3 = Display(fluid3, 3)
+ x4 = Display(fluid4, 4)
+ x5 = Display(fluid5, 5)
+ x6 = Display(fluid6, 6)
+ x7 = Display(fluid7, 7)
+ x8 = Display(fluid8, 8)
+ x9 = Display(fluid9, 9)
+
+ total = x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9
+ proc = (total * 100) / (2400 * 9)
+
+ gpu:setText(0, 11, "Procent full: ".. string.format("%.2f",proc) .. "%") 
+
+ gpu:setText(0, 13, "=========================================") 
+ gpu:setText(0, 15, "Reactor cores:") 
+
+ y1 = ShowContainerInfo(cont1, 17, 1)
+ y2 = ShowContainerInfo(cont2, 18, 2)
+ y3 = ShowContainerInfo(cont3, 19, 3)
+ y4 = ShowContainerInfo(cont4, 20, 4)
+
+ total2 = y1 + y2 + y3 + y4
+ proc2 = (total2 * 100) / (4800 * 4)
+
+ gpu:setText(0, 22, "Procent full: ".. string.format("%.2f",proc2) .. "%") 
+
+ scr1.text = string.format("%.2f",proc) .. "%"
+ scr2.text = string.format("%.2f",proc2) .. "%"
+ scr3.text = "Coolant"
+ scr4.text = "Cores"
+
+ gpu:setText(60, 0, "Water tanks:") 
+ ShowWaterTank(fluid10, 1)
+ ShowWaterTank(fluid11, 2)
+ ShowWaterTank(fluid12, 3)
+ ShowWaterTank(fluid13, 4)
+ 
+ gpu:flush()
+
+ netcard:send(receiver, port, "Cooling Fluid: " .. string.format("%.2f",proc) .. "|Reactor Cores: " .. string.format("%.2f",proc2))
+end

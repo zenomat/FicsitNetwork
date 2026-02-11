@@ -1,0 +1,42 @@
+-- Alum factory second screen - batteries
+local fs = filesystem
+local serverOnLine = false
+debugMode = false
+
+function LoadInitializationFile()
+	-- get internet card
+	card = computer.getPCIDevices(findClass("FINInternetCard"))[1]
+
+	-- get library from internet
+	local req = card:request("http://localhost/LuaCode/UraniumFactory/InitComponents.lua", "GET", "")
+	local _, libdata = req:await()
+
+	-- save library to filesystem
+	filesystem.initFileSystem("/dev")
+	filesystem.makeFileSystem("tmpfs", "tmp")
+	filesystem.mount("/dev/tmp","/")
+	local file = filesystem.open("InitComponents.lua", "w")
+	if (libdata ~= nil) then
+		file:write(libdata)
+		file:close()
+		-- load the library from the file system and use it
+		local json = filesystem.doFile("InitComponents.lua")
+		serverOnLine = true
+	else
+		print("Can not load file, server NOT online")
+	end
+	return serverOnLine
+end
+
+LoadInitializationFile()
+
+if (serverOnLine == true) then
+	Initialization(debugMode)	
+	LoadFiles(debugMode)
+	InitScreen()
+	print("Loading complete")
+end
+
+while serverOnLine do
+	DoLoop()	
+end

@@ -1,0 +1,125 @@
+; Copyright 2023 MSI International (Europe) GmbH
+; This is a Setup information file for monitors with ICM file.
+
+
+[Version]
+signature="$CHICAGO$"
+Class=Monitor
+ClassGuid={4D36E96E-E325-11CE-BFC1-08002BE10318}
+Provider=%MSI%
+Catalogfile=MSI MAG 27CQ6F.cat
+DriverVer=08/17/2022,1.0.0.0
+
+[ControlFlags]
+ExcludeFromSelect.nt=Monitor\MSI3CD9
+ExcludeFromSelect.nt=Monitor\MSI3CD9
+ExcludeFromSelect.nt=Monitor\MSI3CD9
+
+[DestinationDirs]
+DefaultDestDir=11
+3CD9_H2.CopyFiles=23
+3CD9_H1.CopyFiles=23
+3CD9_DP.CopyFiles=23
+
+
+[SourceDisksNames]
+1=%DiskName%,,,
+
+[SourceDisksFiles]
+MSI MAG 27CQ6F.ICM=1
+
+[Monitor_Service.Install]
+DisplayName    = %Monitor.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\monitor.sys
+
+
+[Manufacturer]
+%MSI%=MSI,ntamd64, NTarm64
+
+[MSI]
+%3CD9_H2%=3CD9_H2.Install, Monitor\MSI3CD9
+%3CD9_H1%=3CD9_H1.Install, Monitor\MSI3CD9
+%3CD9_DP%=3CD9_DP.Install, Monitor\MSI3CD9
+
+[MSI.ntamd64]
+%3CD9_H2%=3CD9_H2.Install, Monitor\MSI3CD9
+%3CD9_H1%=3CD9_H1.Install, Monitor\MSI3CD9
+%3CD9_DP%=3CD9_DP.Install, Monitor\MSI3CD9
+
+[MSI.NTarm64]
+%3CD9_H2%=3CD9_H2.Install, Monitor\MSI3CD9
+%3CD9_H1%=3CD9_H1.Install, Monitor\MSI3CD9
+%3CD9_DP%=3CD9_DP.Install, Monitor\MSI3CD9
+
+[3CD9_H2.Install]
+DelReg=DEL_CURRENT_REG
+AddReg=3CD9_H2.AddReg
+Copyfiles=3CD9_H2.CopyFiles
+
+[3CD9_H2.Install.Services]
+AddService = monitor, %SPSVCINST_ASSOCSERVICE%,Monitor_Service.Install
+
+[3CD9_H1.Install]
+DelReg=DEL_CURRENT_REG
+AddReg=3CD9_H1.AddReg
+Copyfiles=3CD9_H1.CopyFiles
+
+[3CD9_H1.Install.Services]
+AddService = monitor, %SPSVCINST_ASSOCSERVICE%,Monitor_Service.Install
+
+[3CD9_DP.Install]
+DelReg=DEL_CURRENT_REG
+AddReg=3CD9_DP.AddReg
+Copyfiles=3CD9_DP.CopyFiles
+
+[3CD9_DP.Install.Services]
+AddService = monitor, %SPSVCINST_ASSOCSERVICE%,Monitor_Service.Install
+
+
+[DEL_CURRENT_REG]
+HKR,MODES
+HKR,,MaxResolution
+HKR,,DPMS
+HKR,,ICMProfile
+
+
+[3CD9_H2.AddReg]
+HKR,"MODES\2560,1440",Mode1,,"30.0-215.0,48.0-144.0,+,+"
+HKR,,MaxResolution,,"2560,1440"
+HKR,,DPMS,,1
+HKR,,ICMProfile,0,"MSI MAG 27CQ6F.icm"
+
+[3CD9_H1.AddReg]
+HKR,"MODES\2560,1440",Mode1,,"30.0-215.0,48.0-144.0,+,+"
+HKR,,MaxResolution,,"2560,1440"
+HKR,,DPMS,,1
+HKR,,ICMProfile,0,"MSI MAG 27CQ6F.icm"
+
+[3CD9_DP.AddReg]
+HKR,"MODES\2560,1440",Mode1,,"263.0-263.0,48.0-180.0,+,+"
+HKR,,MaxResolution,,"2560,1440"
+HKR,,DPMS,,1
+HKR,,ICMProfile,0,"MSI MAG 27CQ6F.icm"
+
+[3CD9_H2.CopyFiles]
+MSI MAG 27CQ6F.icm
+
+[3CD9_H1.CopyFiles]
+MSI MAG 27CQ6F.icm
+
+[3CD9_DP.CopyFiles]
+MSI MAG 27CQ6F.icm
+
+[Strings]
+SPSVCINST_ASSOCSERVICE = 0x00000002
+Monitor.SVCDESC = "Microsoft Monitor Class Function Driver Service"
+
+MSI="MSI International (Europe) GmbH"
+DiskName="MSI Monitor Installation Disk"
+
+3CD9_H2="MSI MAG 27CQ6F"
+3CD9_H1="MSI MAG 27CQ6F"
+3CD9_DP="MSI MAG 27CQ6F"

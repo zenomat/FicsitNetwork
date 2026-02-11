@@ -1,4 +1,5 @@
 function CheckScreenTimeOut()
+
 	if (debugMode == true) then
 		showInfoOnScreen = true	
 	else

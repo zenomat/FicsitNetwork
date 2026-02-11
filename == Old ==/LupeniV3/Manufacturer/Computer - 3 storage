@@ -1,0 +1,267 @@
+-- uses 3 manufactures and 3 storage unit (storage 4 is finished good)s
+-- read the BOM from the manufactures and based on BOM runs 2 checks:
+-- IF all manufactures ran out of raw materials, cut the power
+-- WHEN there are raw materials in storage (compared with BOM), turn back power
+
+switch = component.proxy(component.findComponent("PowerSwitch")[1])
+man1 = component.proxy(component.findComponent("Man1")[1])
+man2 = component.proxy(component.findComponent("Man2")[1])
+man3 = component.proxy(component.findComponent("Man3")[1])
+
+storage1 = component.proxy(component.findComponent("Storage1"))
+storage2 = component.proxy(component.findComponent("Storage2"))
+storage3 = component.proxy(component.findComponent("Storage3"))
+storage4 = component.proxy(component.findComponent("Storage4"))
+
+containerInvs = {}
+
+gpu = computer.getPCIDevices(classes.GPUT1)[1]
+screen = component.proxy(component.findComponent("Screen1")[1])
+
+ingredients = man1:getRecipe():getIngredients()
+bomMatrix = {}
+
+-- Network:
+receiverNetCard = "D93EBF994447118AEACAD687CC883780" -- server network card
+port = 1113
+netcard = component.proxy(component.findComponent("NetCard")[1])
+netcard:open(port)
+
+local whatAreWeProducing = ""
+
+local function getMatrixSize(matrix)
+    -- Number of rows
+    local numRows = #matrix
+    
+    -- Number of columns (assuming the first row is representative)
+    local numCols = 0
+    if numRows > 0 then
+        numCols = #matrix[1]
+    end
+    
+    return numRows, numCols
+    --Ex:
+    --rows, cols = getMatrixSize(bomMatrix)
+	--print("Number of rows:", rows)
+	--print("Number of columns:", cols)
+end
+
+function InitScreen()
+	-- setup gpu
+	gpu:bindScreen(screen)
+	w,h = gpu:getSize()
+	--print(w, h)
+		
+	-- clean screen
+	gpu:setBackground(0,0,0,0)
+	gpu:fill(0,0,w,h," ")
+	gpu:flush()
+end
+
+function ShowMsg(x, y, msg, color)
+    if (color == nil) then
+			gpu:setForeground(1, 1, 1 , 1) 
+		elseif (color == "red") then
+			gpu:setForeground(1, 0, 0 , 1) 
+		elseif (color == "green") then		
+			gpu:setForeground(0, 1, 0, 1) 	
+		elseif (color == "yellow") then					
+			gpu:setForeground(1, 1, 0, 1) 	
+    end
+    
+	gpu:setText(x, y, msg)
+	gpu:flush()
+end
+
+function CreateBomMatrix(manufacturer)
+	-- read the BOM and creates the matrix
+	i = 1
+	posy = 5
+	ShowMsg(5, 1, "Producing: " .. man1:getRecipe().name)
+	ShowMsg(5, 3, "Ingridients:")
+	whatAreWeProducing = man1:getRecipe().name
+	
+	for i, ingredient in ipairs(ingredients) do		
+		ShowMsg(5, posy, ingredient.type.name .. " - Quantity: " .. ingredient.amount)
+		posy = posy + 1
+		-- create ingridient matrix
+		bomMatrix[i] = {ingredient.type.name, ingredient.amount}
+		i = i + 1;
+	end
+	
+	gpu:flush()
+end
+
+function EnoughRawInMatrix(name, quantity)
+	-- for one item from BOM checks if there is enough material
+	enoughRaw = false	
+	if (value ~= 0 ) then
+		for i = 1, #bomMatrix do
+		    for j = 1, 2 do
+	    	    if (bomMatrix[i][1] == name and quantity > tonumber(bomMatrix[i][2])) then
+	    	    	enoughRaw = true
+	    	    	break
+	    	    end    	    	
+		    end
+		end
+	end
+	return enoughRaw
+end
+
+function CheckEnoughRawInMan(manufacturer, title, x, y)
+	posY = y
+	local enoughRaw = 0
+	inv = manufacturer:getInputInv()
+	ShowMsg(x, y,   title)
+	ShowMsg(x, y+1, "=======================")
+
+	y = y + 2
+	for j = 0, inv.size do
+		 local stack = inv:getStack(j)
+		 if stack ~= nil and stack.item ~= nil and stack.item.type ~= nil then
+			--print(stack.item.type.name.." "..stack.count)						
+			
+			check = EnoughRawInMatrix(stack.item.type.name, stack.count)	
+					
+			if (check == true) then
+				ShowMsg(x, y, stack.item.type.name .. " - " .. tostring(stack.count) .. " OK")							
+				enoughRaw = enoughRaw + 1
+			else
+				ShowMsg(x, y, stack.item.type.name .. " - " .. tostring(stack.count) .. " !! NOT OK !!", "red")
+			end
+			y = y + 1	 	
+		 end
+		 
+	end
+	
+	rows, cols = getMatrixSize(bomMatrix)
+	-- check if there are enough raw material in the machine to start production
+ 	if (enoughRaw == rows) then
+ 		ShowMsg(x, y, "Enough Raw material - running", "green")
+ 		ShowMsg(x, y+1, "Progress: " .. math.floor(manufacturer.progress * 100) .. " %")
+ 		return true
+ 	else
+ 		ShowMsg(x, y, "NOT Enough Raw material - stopped", "red")
+ 		return false
+ 	end
+ 	
+ 	gpu:flush()
+end
+
+function ItemCount(containers, x, y, name)
+	value = 0
+	content = ""
+	enoughRawMat = false
+	enoughRawString = "Enough for prod"
+	
+	for _,container in pairs(containers) do
+    	containerInvs[container] = container:getInventories()[1]
+	    value = (containerInvs[container].ItemCount)		
+		if (containerInvs[container]:getStack(0).item.type ~= nil) then  		    
+			content = containerInvs[container]:getStack(0).item.type.name 
+		end
+	end
+			
+	if (name ~= "Finished goods") then
+		--check if we have enough raw material in storage	
+		if (value ~= 0 ) then
+			for i = 1, #bomMatrix do
+				for j = 1, 2 do
+					if (bomMatrix[i][1] == content and value > tonumber(bomMatrix[i][2])) then
+						enoughRawMat = true
+						break
+					end    	    	
+				end
+			end
+		end
+
+		if (enoughRawMat == true) then
+			enoughRawString = "OK"
+		else
+			enoughRawString = "NOT ok"
+		end
+
+		ShowMsg(x, y, name)
+		if (value == 0 ) then
+			ShowMsg(x, y + 1, "Empty" .. " -> " .. enoughRawString, "red")
+		else
+			if (enoughRawMat == true) then
+				ShowMsg(x, y + 1, content .. " -> " .. tostring(value) .. " - " ..enoughRawString, "green")
+			else
+				ShowMsg(x, y + 1, content .. " -> " .. tostring(value) .. " - " ..enoughRawString, "red")
+			end
+		end		
+	else
+		ShowMsg(x, y, name)
+		ShowMsg(x, y + 1, content .. " -> " .. tostring(value))
+	end
+		
+	return enoughRawMat, value
+end
+
+
+function statusOnRaw(boolValue)
+	if boolValue == true then
+		return "Ok|"
+	else
+		return "NotOk|"
+	end
+end
+
+InitScreen()
+CreateBomMatrix(man1)
+
+while true do
+	local powerOn = ""
+	
+	InitScreen()
+	CreateBomMatrix(man1)
+	
+	raw1 = CheckEnoughRawInMan(man1, "Manufacturer 1", 5, 13)
+	raw2 = CheckEnoughRawInMan(man2, "Manufacturer 2", 40, 13)
+	raw3 = CheckEnoughRawInMan(man3, "Manufacturer 3", 80, 13)
+	
+	st1 = ItemCount(storage1, 5, 22, "Storage1")
+	st2 = ItemCount(storage2, 5, 25, "Storage2")
+	st3 = ItemCount(storage3, 5, 28, "Storage3")
+
+	local enough, storageCount = ItemCount(storage4, 40, 22, "Finished goods")
+	
+	if (raw1 == false and raw2 == false and raw3 == false) then
+		ShowMsg(50, 1, "Manufacturing process STOPPED!!", "red")
+		switch:setIsSwitchOn(false)
+		powerOn = "Off"
+	end
+	
+	if (st1 == true and st2 == true and st3 == true) then
+		--if there are enough raw materials in storage, turn on power
+		switch:setIsSwitchOn(true)
+		powerOn = "On"			
+	end	
+
+	oneMachineIsOff = (raw1 == false or raw2 == false or raw3 == false) 
+	oneMachineIsOn = (raw1 == true or raw2 == true or raw3 == true)
+	
+	if (oneMachineIsOff and oneMachineIsOn) then
+		ShowMsg(50, 1, "Manufacturing process RUNNING", "yellow")
+	end
+
+	if (raw1 == true and raw2 == true and raw3 == true) then
+		ShowMsg(50, 1, "Manufacturing process RUNNING", "green")
+	end	
+
+	if (st1 == false or st2 == false or st3 == false) then
+		ShowMsg(50, 2, "Low on raw materials", "red")
+	end	
+	
+	-- set message to send to server
+	local netSendMsg = whatAreWeProducing .. "|" .. statusOnRaw(raw1) .. statusOnRaw(raw2) .. statusOnRaw(raw3) 
+		.. tostring(storageCount) .. "|" .. powerOn
+	ShowMsg(50, 3, netSendMsg)
+
+	--netcard:send(receiverNetCard, port, "CrystalOscilator|Ok|Ok|NotOk|996|On")
+	netcard:send(receiverNetCard, port, netSendMsg)
+	
+	event.pull(1)	
+	gpu:flush()
+end

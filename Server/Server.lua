@@ -1,0 +1,197 @@
+gpu = computer.getPCIDevices(classes.GPUT1)[1]
+screen = component.proxy(component.findComponent("Display1")[1])
+powerInfo = component.proxy(component.findComponent("powerInfo")[1])
+
+-- Network:
+netcard = component.proxy(component.findComponent("NetCard")[1])
+netcard:open(1111) -- Assembler
+
+print("Remember to use same UID for network cards around the network")
+
+--netcard:open(1112)
+--netcard:open(1113) -- Man Crystal Oscilator 1
+--netcard:open(1114) -- Man Computers 1
+
+-- Define column widths
+local colWidthName = 18
+local colWidthMan = 6
+local colWidthQty = 10
+local colWidthOnOff = 6
+
+local labelWidth = 15 -- Define the maximum width for the labels
+local valueWidth = 20 -- Define the maximum width for the values
+
+local con = powerInfo:getPowerConnectors()[1]
+circuit = con:getCircuit()
+
+-- =================== Functions ======================================
+
+function InitScreen()
+	-- setup gpu
+	gpu:bindScreen(screen)
+	w,h = gpu:getSize()
+	print("Screen resolution: " .. tostring(w) .. " x " .. tostring(h))
+		
+	-- clean screen
+	gpu:setBackground(0,0,0,0)
+	gpu:fill(0,0,w,h," ")
+	gpu:flush()
+end
+
+function ShowMsg(x, y, msg, color)
+    if (color == nil) then
+			gpu:setForeground(1, 1, 1 , 1) 
+		elseif (color == "red") then
+			gpu:setForeground(1, 0, 0 , 1) 
+		elseif (color == "green") then		
+			gpu:setForeground(0, 1, 0, 1) 	
+		elseif (color == "yellow") then					
+			gpu:setForeground(1, 1, 0, 1) 	
+    end
+    
+	gpu:setText(x, y, msg)
+	gpu:flush()
+end
+
+function padRight(str, width)
+    return str .. string.rep(" ", width - #str)
+end
+
+
+function formatRow(label, value, unit, labelWidth, valueWidth)
+    local paddedLabel = padRight(label, labelWidth)
+    local paddedValue = padRight(string.format("%.2f", value) .. " " .. unit, valueWidth)
+    return "║ " .. paddedLabel .. paddedValue .. " ║"
+end
+
+ -- Function to create a data line
+function createDataLine(name, man1, man2, man3, quantity, onoff)
+    local paddedName = padRight(name, colWidthName)
+    local paddedMan1 = padRight(man1, colWidthMan)
+    local paddedMan2 = padRight(man2, colWidthMan)
+    local paddedMan3 = padRight(man3, colWidthMan)
+    local paddedQty = padRight(tostring(quantity), colWidthQty)
+    local paddedOnOff = padRight(onoff, colWidthOnOff)
+    return "║ " .. paddedName .. "║ " .. paddedMan1 .. "║ " .. paddedMan2 .. "║ " .. paddedMan3 .. "║ " .. paddedQty .. "║ " .. paddedOnOff .. "║"
+end
+
+-- Function to show data line with color
+function showDataLine(x, y, data)
+    local offsetX = x
+
+    -- Helper function to set color and write text
+    local function writeColoredText(text, color)
+        gpu:setForeground(color[1], color[2], color[3], color[4])
+        gpu:setText(offsetX, y, text)
+        offsetX = offsetX + #text
+    end
+
+    -- Define colors
+    local green = {0, 1, 0, 1}
+    local red = {1, 0, 0, 1}
+    local defaultColor = {1, 1, 1, 1}
+
+    -- Helper function to determine color
+    local function getColor(value)
+        if value == "Ok" or value == "On" then
+            return green
+        elseif value == "NotOk" or value == "Off" then
+            return red
+        else
+            return defaultColor
+        end
+    end
+
+    -- Prepare data segments
+    local segments = {
+        {text = padRight(data[1], colWidthName), color = defaultColor},
+        {text = padRight(data[2], colWidthMan), color = getColor(data[2])},
+        {text = padRight(data[3], colWidthMan), color = getColor(data[3])},
+        {text = padRight(data[4], colWidthMan), color = getColor(data[4])},
+        {text = padRight(data[5], colWidthQty), color = defaultColor},
+        {text = padRight(data[6], colWidthOnOff), color = getColor(data[6])},
+    }
+
+    -- Write segments with appropriate colors and separators
+    gpu:setText(offsetX, y, "║")
+    offsetX = offsetX + 2 -- Adjust for the separator
+    for i, segment in ipairs(segments) do
+        writeColoredText(segment.text, segment.color)
+        gpu:setForeground(defaultColor[1], defaultColor[2], defaultColor[3], defaultColor[4])
+        gpu:setText(offsetX, y, "║")
+        offsetX = offsetX + 2 -- Adjust for the separator
+    end
+end
+
+function ShowPowerInfo()
+ 	ShowMsg(2,1,  "╔═════════════════════════════════════╗ ")
+ 	ShowMsg(2,2,  "║            Power Info               ║ ")
+ 	ShowMsg(2,3,  "║                                     ║ ") 	
+	ShowMsg(2, 4, formatRow("Consumption", circuit.consumption, "MW", labelWidth, valueWidth))
+	ShowMsg(2, 5, formatRow("Production", circuit.production, "MW", labelWidth, valueWidth))
+	ShowMsg(2, 6, formatRow("Capacity", circuit.capacity, "MW", labelWidth, valueWidth))
+	ShowMsg(2, 7, formatRow("Left", circuit.capacity - circuit.consumption, "MW", labelWidth, valueWidth))
+	ShowMsg(2, 8, formatRow("Bat Store", circuit.batteryCapacity, "MW", labelWidth, valueWidth)) 	 	 	
+ 	ShowMsg(2,9,  "║                                     ║ ")
+ 	ShowMsg(2,10, "╚═════════════════════════════════════╝ ")
+end
+
+function ShowManufacturerInfo(x, y, dataString)
+
+	--local dataString = "Crystal Oscilator|Ok|NotOk|Ok|996|Off"
+
+	-- Split the data string
+	local data = {}
+	for value in string.gmatch(dataString, "[^|]+") do
+	    table.insert(data, value)
+	end
+
+	local dataLine = createDataLine(data[1], data[2], data[3], data[4], data[5], data[6])
+
+	showDataLine(x, y, data)
+end
+		
+InitScreen()	
+event.listen(netcard)
+	
+-- ============================ Main Loop ==================================
+
+while true do
+	e, s, sender, port, message = event.pull(1)
+
+	ShowPowerInfo()
+
+	ShowMsg(50,1, "╔═══════════════════════════════════════════════════════════════╗")
+	ShowMsg(50,2, "║            Manufacturing                                      ║")
+	ShowMsg(50,3, "║                                                               ║")
+	ShowMsg(50,4, "║ Name              ║ Man1  ║ Man2  ║ Man3  ║ Quantity  ║ OnOff ║")
+
+
+ 	if e == "NetworkMessage" then
+ 		-- AI Limiter:
+ 		if (port == 1111) then
+			ShowMsg(2, 12, message)				
+		end
+		
+ 		if (port == 1113) then
+			--ShowMsg(2, 14, message)				
+			ShowManufacturerInfo(50 , 5, message)
+			--print(message)
+		end		
+		
+		 if (port == 1114) then
+			--ShowMsg(2, 14, message)				
+			ShowManufacturerInfo(50, 6, message)
+			--print(message)
+		end		
+
+	end
+	
+	ShowMsg(50,7, "║                   ║       ║       ║       ║           ║       ║")
+	ShowMsg(50,8, "╚═══════════════════════════════════════════════════════════════╝")
+
+end
+
+
+
+

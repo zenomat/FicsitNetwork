@@ -1,0 +1,77 @@
+
+fluid1 = component.proxy(component.findComponent("HeavyOil1"))
+fluid2 = component.proxy(component.findComponent("HeavyOil2"))
+fuel1 = component.proxy(component.findComponent("Fuel1"))
+fuel2 = component.proxy(component.findComponent("Fuel2"))
+
+panel = component.proxy(component.findComponent("Panel")[1])
+
+dsp1 = panel:getModule(0, 9, 0)
+dsp2 = panel:getModule(0, 6, 0)
+dsp3 = panel:getModule(5, 9, 0)
+dsp4 = panel:getModule(5, 6, 0)
+
+gauge1 = panel:getModule(2, 9, 0)
+gauge2 = panel:getModule(2, 6, 0)
+gauge3 = panel:getModule(7, 9, 0)
+gauge4 = panel:getModule(7, 6, 0)
+
+
+--fluid3 = component.proxy(component.findComponent("FluidTank3"))
+--fluid4 = component.proxy(component.findComponent("FluidTank4"))
+
+containerInvs = {}
+
+function FluidCount(fluidIndex)
+  count = 0
+  for _,container in pairs(fluidIndex) do
+      containerInvs[container] = container:getFluidType()
+      count = container.fluidContent
+     
+      --if (count > 390) then
+      --  container:flush()
+      --end 
+  end
+  return count
+end
+
+function convertToPercentage(number)
+    -- Ensure the number is within the valid range
+    if number < 0 or number > 2400 then
+        print("Input number must be between 0 and 2400")
+    end
+
+    -- Calculate the percentage
+    local percentage = (number / 2400) * 100
+
+    -- Return the calculated percentage
+    return percentage
+end
+
+function ShowTankInfo(fluidTank, display, gauge)
+	local fluidLevel = FluidCount(fluidTank)
+	local fillPercent = convertToPercentage(fluidLevel)
+	
+	display:setText(string.format("%.0f", fluidLevel))
+	gauge.percent = fillPercent / 100
+end
+
+gauge1.limit = 0.9
+gauge2.limit = 0.9
+gauge3.limit = 0.9
+gauge4.limit = 0.9
+
+while true do
+	--print(FluidCount(fluid1))
+	ShowTankInfo(fluid1, dsp1, gauge1)	
+	ShowTankInfo(fluid2, dsp2, gauge2)
+	
+	ShowTankInfo(fuel1, dsp3, gauge3)
+	ShowTankInfo(fuel2, dsp4, gauge4)	
+	--print(FluidCount(fluid2))
+	--FluidCount(fluid3)
+	--FluidCount(fluid4)	
+	event.pull(1)
+	
+end
+

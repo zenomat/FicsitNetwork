@@ -1,0 +1,14 @@
+panel = component.proxy("C22D788242DE43FBF1FE5DA8777203C2")
+
+-- set color red on button
+module = panel:getModule(0, 0, 0)
+module:setColor(1, 0, 0 , 1)
+
+module1 = panel:getModule(0, 1, 0)
+module1:setColor(0, 1, 0, 1)
+
+module2 = panel:getModule(1, 0, 0)
+print(module2)
+
+module2.text = "pula"
+module2.size = 100

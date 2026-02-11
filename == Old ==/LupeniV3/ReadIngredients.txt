@@ -1,0 +1,10 @@
+--switch = component.proxy("62A003324A8037EA7A5A699BE4146720")
+
+man1 = component.proxy(component.findComponent("Man1")[1])
+ingredients = man1:getRecipe():getIngredients()
+print("Producing: " .. man1:getRecipe().name)
+print("Ingridients: ")
+
+for i, ingredient in ipairs(ingredients) do
+	print(ingredient.type.name .. " Quantity: " .. ingredient.amount)
+end

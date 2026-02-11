@@ -1,0 +1,76 @@
+-- Alum factory second screen - batteries
+
+local fs = filesystem
+local serverOnLine = false
+local debugMode = true
+local disk_uuid = nil
+
+-------------------------------------------------------
+-- Initialize and mount disk
+-------------------------------------------------------
+function InitDrive()
+    if not fs.initFileSystem("/dev") then
+        computer.panic("Cannot initialize /dev")
+    end
+
+    for _, drive in pairs(fs.children("/dev")) do
+        print("Disk UUID: " .. drive)
+        disk_uuid = drive
+        break
+    end
+
+    if not disk_uuid then
+        computer.panic("No disk found in /dev")
+    end
+
+    fs.mount("/dev/" .. disk_uuid, "/")
+end
+
+-------------------------------------------------------
+-- Download + load initialization file
+-------------------------------------------------------
+function LoadInitializationFile()
+    -- get internet card
+    local card = computer.getPCIDevices(classes.FINInternetCard)[1]
+    if not card then
+        print("No Internet Card found")
+        return false
+    end
+
+    -- fetch file
+    local req = card:request("http://localhost/LuaCode/Server/InitComponents.lua", "GET", "")
+    local _, libdata = req:await()
+
+    if not libdata then
+        print("Cannot load file, server NOT online")
+        return false
+    end
+
+    -- init and mount disk
+    InitDrive()
+
+    -- write file
+    local file = fs.open("InitComponents.lua", "w")
+    file:write(libdata)
+    file:close()
+
+    -- load it
+    fs.doFile("InitComponents.lua")
+
+    serverOnLine = true
+    return true
+end
+
+-------------------------------------------------------
+-- Main
+-------------------------------------------------------
+if LoadInitializationFile() then
+    Initialization(debugMode)
+    LoadFiles(debugMode)
+    InitScreen()
+    print("Loading complete")
+end
+
+while serverOnLine do
+    DoLoop()
+end

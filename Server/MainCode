@@ -1,0 +1,155 @@
+--this is the main app that will run on server
+local disk_uuid
+local fs = filesystem
+
+function InitDrive()
+	-- Initialize /dev
+	if fs.initFileSystem("/dev") == false then
+	    computer.panic("Cannot initialize /dev")
+	end
+	-- List all the drives
+	for _, drive in pairs(fs.childs("/dev")) do
+    	print("Disk UUID: " .. drive)
+    	print("Folder: c:\\Users\\zeno\\AppData\\Local\\FactoryGame\\Saved\\SaveGames\\Computers\\" .. drive)
+	    disk_uuid = drive
+	end
+end
+
+function LoadFile(fileName)
+	fs.mount("/dev/".. disk_uuid, "/")
+	program = fs.open(fileName, r)
+	fs.doFile(fileName)
+end
+
+--local sound = component.proxy(component.findComponent("Speaker")[1])
+--sound:setRange(1000000000)
+--sound:setVolume(1)
+--sound:playSound("Fused", 0)   
+
+InitDrive()
+
+LoadFile("//InitComponents.lua")
+LoadFile("//ScreenFunctions.lua")
+LoadFile("//PowerInfo.lua")
+LoadFile("//Manufacturer.lua")
+LoadFile("//ShowMissingRaw.lua")
+
+-- Open ports:
+netcard:open(1111) -- Assembler
+netcard:open(1112) -- Computer
+netcard:open(1114) -- Crystal 2
+netcard:open(1115) -- Heavy Frame
+netcard:open(1116) -- High Speed connector
+netcard:open(1117) -- Modular Engine
+netcard:open(1118) -- Super Computer
+netcard:open(1119) -- Adaptive Control Unit
+netcard:open(1120) -- Radio Control Unit
+netcard:open(1121) -- High Speed Connector 2
+netcard:open(1122) -- MagneticFieldGenerator
+
+InitScreen()	
+
+missingRawMaterial = {}	
+
+function SensorActive(sensor)
+	local signLabel = sensor:getPrefabSignData():getTextElement("Name")		
+	return (signLabel == "FIXIT PROXIMITY SENSOR - ON") 	
+end
+
+function SetLabelText(textForOverheadSign)
+	-- changes the text for the over head sign
+	signData = labelSign[1]:getPrefabSignData() --Gets the SignData Object
+	signData:setTextElement( "Name" , textForOverheadSign ) -- Changes the name of the Signdata
+	labelSign[1]:setPrefabSignData(signData) -- Assigns changed Signdata to Sign (this is the step you were missing)
+end
+
+netcard:closeAll()
+
+
+while true do
+	
+	local active = SensorActive(sensor)
+	ShowPowerInfo()		
+		
+	if (active) then
+		screenIsClean = false
+		e, s, sender, port, message = event.pull(1)		
+		print(message)
+					
+		ShowManHeader()	
+		
+		if e == "NetworkMessage" then	
+ 			-- AI Limiter:
+	 		if (port == 1111) then
+				--ShowMsg(2, 12, message)							
+			end
+		
+	 		if (port == 1112) then
+ 				-- Computer
+				ShowManufacturerInfo(50, 6, message)			
+			end		
+		
+			 if (port == 1114) then
+				ShowManufacturerInfo(50, 7, message)
+			end		
+		
+			 if (port == 1115) then
+			 	--print(message)
+				ShowManufacturerInfo(50, 8, message)
+			end				
+		
+			 if (port == 1116) then 
+			 	--High Speed connector
+			 	--print(message)
+				ShowManufacturerInfo(50, 9, message)
+			end						
+		
+			if (port == 1117) then 
+				-- Modular Engine
+				--print(message)
+				ShowManufacturerInfo(50, 10, message)
+			end								
+			
+			if (port == 1118) then 
+				-- Super Computer
+				--print(message)
+				ShowManufacturerInfo(50, 11, message)
+			end										
+			
+			if (port == 1119) then 
+				-- Adaptive Control Unit
+				--print(message)
+				ShowManufacturerInfo(50, 12, message)
+			end												
+			
+			if (port == 1120) then 
+				-- Radio control unit
+				--print(message)
+				ShowManufacturerInfo(50, 13, message)
+			end										
+
+			if (port == 1121) then 
+				-- High Speed Connector 2
+				--print(message)
+				ShowManufacturerInfo(50, 14, message)
+			end																							
+			
+			if (port == 1122) then 
+				-- Magnetic Field Generator
+				--print(message)
+				ShowManufacturerInfo(50, 15, message)
+			end													
+		end
+			
+		ShowManFooter()	
+		ShowMissingRawMaterials()	
+	else
+		CleanScreen()
+		event.pull(5)
+	end
+end
+
+
+
+
+

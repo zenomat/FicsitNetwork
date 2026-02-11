@@ -1,0 +1,59 @@
+panel = component.proxy("55B004224E0E25874467CEB272FA333C")
+
+scr1 = panel:getModule(0, 9, 0)
+scr2 = panel:getModule(0, 6, 0)
+scr3 = panel:getModule(0, 3, 0)
+
+scr4 = panel:getModule(7, 9, 0)
+scr5 = panel:getModule(7, 6, 0)
+scr6 = panel:getModule(7, 3, 0)
+
+fluid1 = component.proxy(component.findComponent("Fluid1"))
+fluid2 = component.proxy(component.findComponent("Fluid2"))
+fluid3 = component.proxy(component.findComponent("Fluid3"))
+fluid4 = component.proxy(component.findComponent("Fluid4"))
+fluid5 = component.proxy(component.findComponent("Fluid5"))
+fluid6 = component.proxy(component.findComponent("Fluid6"))
+
+containerInvs = {}
+
+function InitScreen(screen)
+  screen.size = 100
+  screen.text = "Scr"
+end
+
+function FluidCount(fluidIndex)
+  count = 0
+  for _,container in pairs(fluidIndex) do
+      containerInvs[container] = container:getFluidType()
+      count = container.fluidContent
+     
+      if (count > 2000) then
+        container:flush()
+      end 
+  end
+  return count
+
+end
+
+function Display(fluidBuffer, screen)  
+  level = FluidCount(fluidBuffer)
+  screen.text = tostring(level) 
+end
+
+InitScreen(scr1)
+InitScreen(scr2)
+InitScreen(scr3)
+InitScreen(scr4)
+InitScreen(scr5)
+InitScreen(scr6)
+
+while true do
+  Display(fluid1, scr1)
+  Display(fluid2, scr2)
+  Display(fluid3, scr3)
+  Display(fluid4, scr4)
+  Display(fluid5, scr5)
+  Display(fluid6, scr6)
+  event.pull(0.1)
+end

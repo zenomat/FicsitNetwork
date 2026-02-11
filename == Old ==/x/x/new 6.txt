@@ -1,0 +1,96 @@
+gpu = computer.getPCIDevices(classes.GPUT1)[1]
+screen = component.proxy(component.findComponent("Screen1")[1])
+showInfoOnScreen = true
+refreshScreen = true
+
+function InitScreen()
+		-- clean screen
+		gpu:setBackground(0,0,0,0)
+		gpu:fill(0,0,w,h," ")
+		gpu:flush()
+end
+
+function ShowMsg(x, y, msg, color)
+	if (showInfoOnScreen == true) then
+	    if (color == nil) then
+				gpu:setForeground(1, 1, 1 , 1) 
+			elseif (color == "red") then
+				gpu:setForeground(1, 0, 0 , 1) 
+			elseif (color == "green") then		
+				gpu:setForeground(0, 1, 0, 1) 	
+			elseif (color == "yellow") then					
+				gpu:setForeground(1, 1, 0, 1) 	
+	    end
+    
+		gpu:setText(x, y, msg)
+		gpu:flush()
+	end
+end
+
+InitScreen()
+-- Init screen
+gpu:bindScreen(screen)
+w,h = gpu:getSize()
+print("Screen size : " .. w, h)
+
+InitScreen()
+
+
+
+gpu:flush()
+
+
+
+-- Function to display the message
+function displayMessage()
+    local message = [[
+┌─────────────┐   ┌─────────────┐  ┌─────────────┐  ┌─────────────┐   ┌─────────────┐                           
+│ Bauxite     │   │1.Alum.Sol   │  │ Silica      │  │2.Alum.Scrap │   │ Alumiscrap  │                           
+│             ├──►├─────────────┤  │             ├─►├─────────────┼   │             │                           
+│ BauxiteValue│   │             ├─►│ SilicaaValue│  │             │──►│ AlumScrpVal │                           
+└─────────────┘   │ Refinery    │  └─────────────┘  │Refinery     │   └─────────────┘                           
+                  │             │                   │             │                                             
+┌─────────────┐   │             │  ┌─────────────┐  └─────▲───────┘   ┌─────────────┐                           
+│ Water Tank  ├──►│             ├─►│ Alum Sol    │        │           │ WaterTank1/2│                           
+│             │   └─────────────┘  │             │  ┌─────┴───────┐   │             │                           
+│ Water1Val   │                    │ 2400 / 100% │  │ Coal Storage│   │ 2400 / 100% │                           
+└─────────────┘                    │ 1200 / 100% │  │             ├─► │ 1200 / 100% │                           
+                                   └─────────────┘  │ CoalStrVal  │   │             │                           
+                                                    └─────────────┘   └─────────────┘                           
+                   ┌─────────────┐                                                                              
+                   │3a.Ignot     │ ┌─────────────┐  ┌─────────────┐                      ┌─────────────┐        
+ ┌─────────────┐   ├─────────────┤►│ Alum. Ignot │  │4.AlumrSheet │                      │ AlumrSheet  │        
+ │ Silica      │   │             │ │             ├─►├─────────────┤                      │             │        
+ │             │   │ Foundry     │ │ IgnorValue__│  │             ├────────────────────► │ AlumrSheetVa│        
+ │ SilicaaValue│   │             │ └─────────────┘  │ Assembler   │                      └─────────────┘        
+ └─────────────┘   └─────────────┘                  │             │   ┌─────────────┐                           
+                                   ┌─────────────┐  │             │   │5.AlumCasing │                           
+                   ┌─────────────┐ │ Copper__    ├─►└─────────────┘   ├─────────────┤                           
+ ┌─────────────┐   │3b.Ignot     │ │             │                    │             │    ┌─────────────┐        
+ │ AlumScrap   │   ├─────────────┤ │ CopperValue_│  ┌─────────────┐   │ Constructor ├──► │ AlumCasing  │        
+ │             │   │             │ └─────────────┘  │ Silicae     │   │             │    │             │        
+ │ SilicaaValue│   │ Foundry     │                  │             │   │             │    │ AlumCasingV │        
+ └─────────────┘   │             ├─────────────────►│ SilicaaValue├──►│             │    └─────────────┘        
+                   └─────────────┘                  └─────────────┘   └─────────────┘                           
+]]
+
+    -- Split the message into lines
+    for i, line in ipairs(splitMessageIntoLines(message)) do
+        -- Display each line using ShowMsg function
+        ShowMsg(1, i, line)
+    end
+end
+
+-- Helper function to split the message into lines
+function splitMessageIntoLines(message)
+    local lines = {}
+    for line in message:gmatch("[^\r\n]+") do
+        table.insert(lines, line)
+    end
+    return lines
+end
+
+-- Call the function to display the message
+displayMessage()
+
+ShowMsg(3, 4, "Ccojom")

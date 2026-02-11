@@ -1,0 +1,22 @@
+
+netcard = component.proxy(component.findComponent("NetCard")[1])
+
+netcard:open(8888)
+netcard:open(2000)
+
+while true do
+	
+	e, s, sender, port, message = event.pull(10)
+
+	
+	if e == "NetworkMessage" then
+		if (port == 2000) then
+			print("Sender:" .. sender)
+			print("Port:" .. port)
+			print("Message:" .. message)		
+		end
+	end
+	
+	netcard:broadCast(8888, "bla")
+	event.pull(5)	
+end

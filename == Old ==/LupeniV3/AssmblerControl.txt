@@ -1,0 +1,131 @@
+-- Monitors production of 3 assembler units
+-- When the container reaches 4800 units, turns the assemblers off
+-- Requirements: 3 assemblers, 1 Panel - "Panel1", 1 Storage - "Storage1", 1 Pole - "Pole1", 1 sign label
+
+-- Find all elements
+panel = component.proxy(component.findComponent("Panel1")[1])
+containers = component.proxy(component.findComponent("Storage1"))
+storage1 = component.proxy(component.findComponent("Storage1")[1])
+switch = component.proxy(component.findComponent("PowerSwitch")[1])
+
+-- this monitors the raw materials storage
+--raw1 = component.proxy(component.findComponent("Raw1"))
+--raw2 = component.proxy(component.findComponent("Raw2"))
+
+
+assmb1 = component.proxy(component.findComponent("Man1")[1])
+assmb2 = component.proxy(component.findComponent("Man2")[1])
+assmb3 = component.proxy(component.findComponent("Man3")[1])
+pole1 = component.proxy(component.findComponent("Pole1")[1])
+
+sign = component.proxy(component.findComponent("Display1"))
+print(sign[1]:getPrefabSignData():getTextElement( "Name" ))
+
+
+panel1 = panel:getModule(0, 9, 0)
+panel2 = panel:getModule(0, 7, 0)
+panel3 = panel:getModule(0, 5, 0)
+--panel4 = panel:getModule(8, 0, 0)
+
+led1 = panel:getModule(4, 9, 0)
+led2 = panel:getModule(4, 7, 0)
+led3 = panel:getModule(4, 5, 0)
+
+panelCounter = panel:getModule(0, 0, 0)
+containerInvs = {}
+
+panelCounter.text = "Counter"
+panelCounter.size = 50
+
+panel1.size = 50
+panel2.size = 50
+panel3.size = 50
+--panel4.size = 50
+
+function ItemCount(storageItem)
+  value = 0
+  for _,container in pairs(storageItem) do
+    containerInvs[container] = container:getInventories()[1]
+    value = (containerInvs[container].ItemCount)
+  end
+  
+  return value 
+end
+
+function AssmbState(assmb, led)
+	if (assmb.standby == true) then
+		led:setColor(1, 0, 0 , 1) -- Red
+	else
+		led:setColor(0, 1, 0, 1) --Green
+	end
+end
+
+
+function GetMaxItemsForOneStorageCell(storage)
+	--check the first cell in a storage container to determine the number of items
+	local count
+	--print(storage1)
+	--print(storage1:getInventories()[1])
+
+	inv = storage1:getInventories()[1]
+	for j = 0, 0 do
+		 local stack = inv:getStack(j)
+		 if stack ~= nil and stack.item ~= nil and stack.item.type ~= nil then
+			--print(stack.item.type.name.." "..stack.count)									
+			count = stack.count
+		 end		 
+	end
+	return count
+end
+
+print("Starting loop ..")
+
+while true do
+	--check how many items are in first cell - items are stored in different bachtes (50 items, 100, 200 ...)
+	local itemsInFirstCell = GetMaxItemsForOneStorageCell(storage1)
+	
+	AssmbState(assmb1, led1)
+	AssmbState(assmb2, led2)
+	AssmbState(assmb3, led3)
+
+	local count = ItemCount(containers)
+	--local rawCount1 = ItemCount(raw1) 
+	--local rawCount2 = ItemCount(raw2)	
+
+	panel1.text = "Assmb 1: " .. math.floor(assmb1.progress * 100) .. " %"
+	panel2.text = "Assmb 2: " .. math.floor(assmb2.progress * 100) .. " %"
+	panel3.text = "Assmb 3: " .. math.floor(assmb3.progress * 100) .. " %"
+	--panel4.text = " Raw1 :" .. tostring(rawCount1) .. "\n Raw2: " .. tostring(rawCount2)
+				
+	if (count >= itemsInFirstCell * 48 and count ~= 0) then
+		--production stopped
+		pole1:setColor(1, 0, 0 , 1)
+		assmb1.standby = true
+		assmb2.standby = true
+		assmb3.standby = true
+		switch:setIsSwitchOn(false)
+	else
+		--production running
+		pole1:setColor(0, 1, 0, 1) 
+		assmb1.standby = false
+		assmb2.standby = false
+		assmb3.standby = false
+		pole1:setColor(0, 1, 0, 1)
+		switch:setIsSwitchOn(true)
+	end	
+	
+	-- change text on the label 
+	--label = " St1 :" .. tostring(rawCount1) .. " St2: " .. tostring(rawCount2) .. " Comp Boards: " .. tostring(count)
+	local percent = (count * 100) / (itemsInFirstCell * 48)
+	panelCounter.text = "Count: " .. tostring(count) .. "\n" .. string.format("%.2f", percent) .. "%" 
+	
+	label = "AI limiter: " .. tostring(count) .. " - " .. string.format("%.2f", percent) .. "%"
+	
+	signData = sign[1]:getPrefabSignData() --Gets the SignData Object
+	signData:setTextElement( "Name" , label ) -- Changes the name of the Signdata
+	sign[1]:setPrefabSignData(signData) -- Assigns changed Signdata to Sign (this is the step you were missing)
+
+	event.pull(1) --Without delay sign text will still change but print will still give old Name
+
+end
+
