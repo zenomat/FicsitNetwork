@@ -23,7 +23,7 @@ function InitDrive()
     end
 
     fs.mount("/dev/" .. disk_uuid, "/")
-end
+ end
 
 -------------------------------------------------------
 -- Download + load initialization file
@@ -45,9 +45,6 @@ function LoadInitializationFile()
         computer.panic("Failed to download ComponentsInit.lua")
     end
 
-    -- init and mount disk
-    InitDrive()
-
     -- write file
     local file = fs.open("ComponentsInit.lua", "w")
     file:write(libdata)
@@ -67,6 +64,7 @@ end
 -------------------------------------------------------
 -- Main
 -------------------------------------------------------
+InitDrive()
 LoadInitializationFile()
 Initialization(debugMode, networkPort)
 LoadFiles(debugMode)

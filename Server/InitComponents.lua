@@ -25,6 +25,12 @@ end
 local fs = filesystem
 local card = nil
 
+lastBroadcastTime = 0
+cooldown = 1  -- seconds
+
+swtich = nil
+indicator = nil
+
 -------------------------------------------------------
 -- Initialization
 -------------------------------------------------------
@@ -69,6 +75,16 @@ function Initialization(debug)
 
     missingRawMaterial = {}
     screenIsClean = false
+
+    print("Loading panel...")
+    panel = LoadComponent("ServerPanel", debug)
+    print("panel: " .. tostring(panel))
+
+	switch = panel:getModule(0, 9, 0)
+	indicator = panel:getModule(1, 9, 0)
+
+	print(indicator)
+
 end
 
 -------------------------------------------------------
@@ -110,6 +126,33 @@ function removeUpToLastSlash(inputString)
         return inputString
     end
 end
+
+
+function openPorts(debug)
+    PrintDebugInfo("Opening network ports...", debug)
+    PrintDebugInfo("-------------------------------", debug)
+    --netcard:open(8888)
+    
+    --netcard:open(1111) -- Assembler
+    netcard:open(3000) -- Test Machine
+    netcard:open(1112) -- Computer
+    
+    netcard:open(1114) -- Crystal 2
+    netcard:open(1115) -- Heavy Frame
+    netcard:open(1116) -- High Speed connector
+    netcard:open(1117) -- Modular Engine
+    netcard:open(1118) -- Super Computer
+    netcard:open(1119) -- Adaptive Control Unit
+    netcard:open(1120) -- Radio Control Unit
+    netcard:open(1121) -- High Speed Connector 2    
+    netcard:open(1124) -- Turbo Motorw 1
+    netcard:open(1125) -- Turbo Motorw 2
+    netcard:open(1126) -- Thermal Propulsion Rocket
+    netcard:open(1127) -- Computer 2
+    netcard:open(1128) -- Computer 3
+    
+end
+
 
 -------------------------------------------------------
 -- Load all modules

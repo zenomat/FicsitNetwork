@@ -34,7 +34,7 @@ function ShowReportTemplate()
     -- Split the message into lines
     for i, line in ipairs(splitMessageIntoLines(message)) do
         -- Display each line using ShowMsg function
-        ShowMsg(1, i, line)
+        ShowMsg(1, i, line)        
     end
 end
 

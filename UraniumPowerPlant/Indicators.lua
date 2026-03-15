@@ -1,19 +1,4 @@
 
--------------------------------------------------------
--- Reactor status control
--------------------------------------------------------
-
-function CheckReactorStatus()
-	Reactor1.standby = not switches[1].state
-	Reactor2.standby = not switches[2].state
-	Reactor3.standby = not switches[3].state
-	Reactor4.standby = not switches[4].state	
-	
-	--SetIndicatorColor(1, Reactor1)
-	--SetIndicatorColor(2, Reactor2)
-	--SetIndicatorColor(3, Reactor3)
-	--SetIndicatorColor(4, Reactor4)	
-end
 
 
 -------------------------------------------------------
@@ -21,15 +6,17 @@ end
 -------------------------------------------------------
 
 function SetIndicatorColor(id, reactor)
-	if (reactor.standby == false) then
-		indicators[id]:setColor(0, 1, 0, 1) -- green
-		modular:getModule(id - 1):setColor(0, 255, 0, 0.01)
-	end
-	
-	if (reactor.standby == true) then
-		indicators[id]:setColor(1, 0, 0, 1) -- red
-		modular:getModule(id - 1):setColor(255, 0, 0, 0.01)
-	end	
+    if reactor.standby == false then
+        indicators[id]:setColor(0, 1, 0, 1) -- green
+        if modular then
+            modular:getModule(id - 1):setColor(0, 1, 0, 1) -- green, normalized 0-1
+        end
+    else
+        indicators[id]:setColor(1, 0, 0, 1) -- red
+        if modular then
+            modular:getModule(id - 1):setColor(1, 0, 0, 1) -- red, normalized 0-1
+        end
+    end	
 end
 
 -------------------------------------------------------
@@ -58,16 +45,31 @@ function LoadIndicators()
 
     indicators = {}
     switches = {}
+    manualControlSwitch= {}
+    
 
     local moduleIndex = 1
-    for x = 2, 5 do
+    for x = 2, 7 do
         indicators[moduleIndex] = panel:getModule(x, 9, 0)
         moduleIndex = moduleIndex + 1
     end
 
     moduleIndex = 1
-    for x = 2, 5 do
+    for x = 2, 7 do
         switches[moduleIndex] = panel:getModule(x, 8, 0)
         moduleIndex = moduleIndex + 1
     end
+
+    -- Manual control switch and indicators
+    manualControlSwitch = panel:getModule(2, 7, 0)
+    manualIndicator = panel:getModule(1, 6, 0)
+    autoIndicator = panel:getModule(3, 6, 0)
+
+    panelBatteryInfo = panel:getModule(1, 4, 0)    
+    panelAutoPowerOn = panel:getModule(1, 2, 0)
+    
+    panelBatteryInfo.size = 40
+    panelAutoPowerOn.size = 40
+    
+    autoPowerOnPotentiometer = panel:getModule(1, 1, 0)
 end

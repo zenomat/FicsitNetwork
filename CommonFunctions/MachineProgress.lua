@@ -11,12 +11,25 @@ function MachineStatus(x, y, machine)
 end
 
 function ReactorStatus(x, y, machine)
-	if (machine ~= nill) then
-		if (machine.standby == false) then
-			ShowMsg(x, y, "█", "green")
-		else
-			ShowMsg(x, y, "█", "red")
-		end
+    local status = 0 
+
+    if (machine ~= nil) then
+        if (machine.standby == false) then
+            ShowMsg(x, y, "█", "green")
+            status = 1
+        else
+            ShowMsg(x, y, "█", "red")
+        end
+    else
+        ShowMsg(x, y, "?")
+    end
+
+    return status
+end
+
+function MachineProgress(x, y, machine)
+	if (machine ~= nill) then	
+		ShowMsg(x, y, machine.progress * 100) 
 	else
 		ShowMsg(x, y, "?")
 	end

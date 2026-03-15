@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uranium Power Plant Monitor</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>⚛️ Uranium Power Plant Monitor</h1>
+            <div class="status-bar">
+                <span id="connection-status">Connecting...</span>
+                <span id="local-time">--:--:--</span>
+                <span>Day <span id="days-since-landing">0</span></span>
+            </div>
+        </div>
+
+        <!-- Power Info Section -->
+        <div class="section power-info">
+            <h2>Power Generation</h2>
+            <div class="power-grid">
+                <div class="power-item">
+                    <span class="label">Production</span>
+                    <span class="value"><span id="production">0</span> MW</span>
+                </div>
+                <div class="power-item">
+                    <span class="label">Consumption</span>
+                    <span class="value"><span id="consumption">0</span> MW</span>
+                </div>
+                <div class="power-item">
+                    <span class="label">Capacity</span>
+                    <span class="value"><span id="capacity">0</span> MW</span>
+                </div>
+                <div class="power-item">
+                    <span class="label">Left</span>
+                    <span class="value"><span id="left">0</span> MW</span>
+                </div>
+            </div>
+
+            <!-- Battery Storage -->
+            <div class="battery-section">
+                <h3>Battery Storage</h3>
+                <div class="storage-bar">
+                    <div class="fill" id="battery-bar" style="width: 50%"></div>
+                    <span class="percent" id="battery-percent">50%</span>
+                </div>
+                <div class="count" id="battery-val">0MW / 0MW</div>
+            </div>
+        </div>
+
+        <!-- Reactors Section -->
+        <div class="section reactors">
+            <h2>Reactors</h2>
+            <div class="reactor-grid">
+                <div class="reactor-card active" id="reactor-1">
+                    <div class="reactor-status">ACTIVE</div>
+                    <div class="reactor-efficiency">85%</div>
+                    <div class="reactor-label">Reactor 1</div>
+                </div>
+                <div class="reactor-card active" id="reactor-2">
+                    <div class="reactor-status">ACTIVE</div>
+                    <div class="reactor-efficiency">88%</div>
+                    <div class="reactor-label">Reactor 2</div>
+                </div>
+                <div class="reactor-card standby" id="reactor-3">
+                    <div class="reactor-status">STANDBY</div>
+                    <div class="reactor-efficiency">0%</div>
+                    <div class="reactor-label">Reactor 3</div>
+                </div>
+                <div class="reactor-card active" id="reactor-4">
+                    <div class="reactor-status">ACTIVE</div>
+                    <div class="reactor-efficiency">82%</div>
+                    <div class="reactor-label">Reactor 4</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Storage Section -->
+        <div class="section storage">
+            <h2>Storage Status</h2>
+            <div class="storage-grid">
+                <div class="storage-item" id="fuel-rod">
+                    <div class="storage-label">Fuel Rod Storage</div>
+                    <div class="storage-bar">
+                        <div class="fill" style="width: 45%"></div>
+                        <span class="percent">45%</span>
+                    </div>
+                    <div class="count">Items: 0</div>
+                </div>
+
+                <div class="storage-item" id="water-tank">
+                    <div class="storage-label">Water Tank</div>
+                    <div class="storage-bar">
+                        <div class="fill" style="width: 78%"></div>
+                        <span class="percent">78%</span>
+                    </div>
+                    <div class="count">0.0L</div>
+                </div>
+
+                <div class="storage-item" id="nuclear-waste">
+                    <div class="storage-label">Nuclear Waste</div>
+                    <div class="storage-bar">
+                        <div class="fill" style="width: 12%"></div>
+                        <span class="percent">12%</span>
+                    </div>
+                    <div class="count">Items: 0</div>
+                </div>
+
+                <div class="storage-item" id="fabric-storage">
+                    <div class="storage-label">Fabric Storage</div>
+                    <div class="storage-bar">
+                        <div class="fill" style="width: 89%"></div>
+                        <span class="percent">89%</span>
+                    </div>
+                    <div class="count">Items: 0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -48,7 +48,7 @@ function DoLoop()
     end
 
     storageFillPercent, textForOverheadSign =
-        ShowFinishedGoodsStatus(finishedGoods, 40, 22, "Finished goods")
+    ShowFinishedGoodsStatus(finishedGoods, 40, 22, "Finished goods")
 
     -- Conditions
     StatusCheck()
@@ -63,19 +63,30 @@ function DoLoop()
         ShowMsg(50, 3, "Not sending to server ...                   ")
     end
 
+    -- Send to server if requested
+    if e == "NetworkMessage" and message == "Reboot" then
+        computer.reset()
+        print("Computer reset by server command.")
+    end
+
     -- Screen timeout
     CheckScreenTimeOut()
 
     -- Overhead sign
     BigSignText(textForOverheadSign .. " - " .. MachineStatus)
+    
 
     gpu:flush()
 
     -- Check for new version
-    CurrentSoftwareVersion = SoftwareVersion
-    ReadFileFromGithub("SoftwareVersion.lua", debugMode)
-    if CurrentSoftwareVersion ~= SoftwareVersion then
-        print("Computer reset. New version detected: " .. SoftwareVersion)
-        computer.reset()
-    end
+    --CurrentSoftwareVersion = SoftwareVersion
+    --print("Current Software Version: " .. tostring(CurrentSoftwareVersion))
+    --ReadFileFromGithub("SoftwareVersion.lua", debugMode)
+    --print("Latest Software Version: " .. tostring(SoftwareVersion))
+    --if CurrentSoftwareVersion ~= SoftwareVersion then
+        --print("Computer reset. New version detected: " .. SoftwareVersion)
+        --computer.reset()
+    --end
+    ShowMsg(50, 5, "Software Version is: " .. tostring(SoftwareVersion) .. " Port: " .. tostring(PortToServer))
+    --BigSignText("version: " .. tostring(SoftwareVersion))
 end

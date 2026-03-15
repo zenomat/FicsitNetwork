@@ -24,5 +24,28 @@ function FluidStorage(x, y, fluidContainer, type)
 	if (type == "small" and inventory > 380) then
         fluidContainer:flush()
 	end 
+	
+	return fillPercent
+end
+
+function ReturnPercentFluidStorage(fluidContainer, type)
+	local fillPercent = 0
+	local inventory = fluidContainer.fluidContent
+	local typeShort = ""
+	
+	if (type == "small") then
+		fillPercent = (inventory * 100) / 400
+		typeShort = "S"
+	else
+		fillPercent = (inventory * 100) / 2400
+		typeShort = "L"
+	end	
+		
+	--flushing 
+	if (type == "small" and inventory > 380) then
+        fluidContainer:flush()
+	end 
+	
+	return fillPercent
 
 end

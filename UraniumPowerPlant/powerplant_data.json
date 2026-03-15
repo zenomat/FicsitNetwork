@@ -1,0 +1,19 @@
+﻿{
+  "production": 1234,
+  "consumption": 800,
+  "capacity": 2000,
+  "batteryStore": 500,
+  "batteryCapacity": 1000,
+  "daysSinceLanding": 5,
+  "localTime": "12:34:56",
+  "reactors": [
+    {"id": 1, "standby": false, "efficiency": 85},
+    {"id": 2, "standby": false, "efficiency": 88},
+    {"id": 3, "standby": true, "efficiency": 0},
+    {"id": 4, "standby": false, "efficiency": 87}
+  ],
+  "fuelRodStorage": {"fillPercent": 45, "itemCount": 120},
+  "waterTank": {"fillPercent": 78, "amount": 1872},
+  "nuclearWaste": {"fillPercent": 32, "itemCount": 85},
+  "fabricStorage": {"fillPercent": 92, "itemCount": 250}
+}

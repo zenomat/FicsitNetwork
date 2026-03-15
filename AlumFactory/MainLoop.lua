@@ -1,6 +1,5 @@
 function DoLoop()
     ShowReportTemplate()
-
     ShowStorageInfo(3, 4, BauxiteStorage, "large")
     ShowStorageInfo(54, 12, CoalStorage, "large")
     local silicaStorage = ShowStorageInfo(38, 4, SilicaStorage1, "large")
@@ -80,6 +79,7 @@ function DoLoop()
     end
 
     -- Silica control
+
     if silicaStorage > 100 then
         ShowMsg(38, 3, "SplitOff", "red")
     else
@@ -87,13 +87,14 @@ function DoLoop()
             SillicaSplitter1:transferItem(1)
             SillicaSplitter1:transferItem(1)
         end
+
         if SillicaSplitter2 then
             SillicaSplitter2:transferItem(1)
             SillicaSplitter2:transferItem(1)
         end
         ShowMsg(38, 3, "SplitOn ", "green")
     end
-
+    
     gpu:flush()
     event.pull(1)
 end

@@ -51,14 +51,18 @@ end
 function Initialization(debug)
 
     gpu = computer.getPCIDevices(classes.GPUT1)[1]
-    screen = LoadComponent("Screen1", debug)
+    screen = LoadComponent("Screen2", debug)
 
     FuelRodStorage = LoadComponent("FuelRodStorage", debug)
     Reactor1 = LoadComponent("Reactor1", debug)
     Reactor2 = LoadComponent("Reactor2", debug)
     Reactor3 = LoadComponent("Reactor3", debug)
     Reactor4 = LoadComponent("Reactor4", debug)
+    Reactor5 = LoadComponent("Reactor5", debug)
+    Reactor6 = LoadComponent("Reactor6", debug)
+
     WaterTankReactor = LoadComponent("WaterTankReactor", debug)
+    WaterTank2 = LoadComponent("WaterTank2", debug)
     PowerInfo = LoadComponent("PowerInfo", debug)
     NuclearWasteStorage = LoadComponent("NuclearWasteStorage", debug)
 
@@ -71,7 +75,7 @@ function Initialization(debug)
     FabricStorage = LoadComponent("FabricStorage", debug)
 
     PrintDebugInfo("Loading panel...", debug)
-    panel = LoadComponent("Panel1", debug)
+    panel = LoadComponent("Panel2", debug)
     PrintDebugInfo("panel: " .. tostring(panel), debug)
 
     dsp1 = panel:getModule(2, 9, 0)
@@ -123,7 +127,7 @@ function ReadFileFromGithub(pathToFile, debug)
 
     fs.doFile(fileName)
 
-    --PrintDebugInfo("File loaded successfully: " .. fileName, debug)
+    PrintDebugInfo("File loaded successfully: " .. fileName, debug)
 end
 
 -------------------------------------------------------
@@ -143,15 +147,17 @@ end
 function LoadFiles(debug)
 
     InitDrive()  -- mount disk ONCE
-
+    ReadFileFromGithub("http://192.168.10.106/LuaCode/CommonFunctions/StorageContainerInfo.lua", debug)
     ReadFileFromGithub("http://192.168.10.106/LuaCode/UraniumPowerPlant/globalVariables.lua", debug)
     ReadFileFromGithub("http://192.168.10.106/LuaCode/CommonFunctions/ScreenFunctions.lua", debug)
     ReadFileFromGithub("http://192.168.10.106/LuaCode/UraniumPowerPlant/PowerInfo.lua", debug)
-    ReadFileFromGithub("http://192.168.10.106/LuaCode/UraniumPowerPlant/ReportTemplate.lua", debug)
-    ReadFileFromGithub("http://192.168.10.106/LuaCode/CommonFunctions/StorageContainerInfo.lua", debug)
+    ReadFileFromGithub("http://192.168.10.106/LuaCode/UraniumPowerPlant/ReportTemplate.lua", debug)    
     ReadFileFromGithub("http://192.168.10.106/LuaCode/CommonFunctions/MachineProgress.lua", debug)
     ReadFileFromGithub("http://192.168.10.106/LuaCode/CommonFunctions/FluidStorage.lua", debug)
     ReadFileFromGithub("http://192.168.10.106/LuaCode/CommonFunctions/GeneralInfo.lua", debug)
     ReadFileFromGithub("http://192.168.10.106/LuaCode/UraniumPowerPlant/Indicators.lua", debug)
     ReadFileFromGithub("http://192.168.10.106/LuaCode/UraniumPowerPlant/MainLoop.lua", debug)
+    
+    --ReadFileFromGithub("http://192.168.10.106/LuaCode/UraniumPowerPlant/WebAppDataSender.lua", debug)
+    ReadFileFromGithub("http://192.168.10.106/LuaCode/UraniumPowerPlant/FileDataSender.lua", debug)
 end

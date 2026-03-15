@@ -22,7 +22,7 @@ function Initialization(debug)
         computer.panic("No GPU found")
     end
 
-    screen = component.proxy(component.findComponent("Screen1")[1])
+    screen = component.proxy(component.findComponent("Screen1AlumFactory")[1])
 
     BauxiteStorage = component.proxy(component.findComponent("BauxiteStorage")[1])
     CoalStorage = component.proxy(component.findComponent("CoalStorage")[1])

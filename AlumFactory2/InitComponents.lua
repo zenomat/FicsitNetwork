@@ -1,99 +1,157 @@
+-------------------------------------------------------
+-- Globals
+-------------------------------------------------------
+local fs = filesystem
+local card = nil
+local disk_uuid = nil
+
+-------------------------------------------------------
+-- Debug
+-------------------------------------------------------
 function PrintDebugInfo(message, debug)
-	if (debug == true) then
-		print(message)
-	end
-end
-
-function Initialization(debug)				
-	gpu = computer.getPCIDevices(classes.GPUT1)[1]
-	screen = component.proxy(component.findComponent("Screen2")[1])
-
-	WaterStorageSulfur = component.proxy(component.findComponent("WaterStorageSulfur")[1])
-	StorageSulfur = component.proxy(component.findComponent("StorageSulfur")[1])
-
-	SulfurRef1 = component.proxy(component.findComponent("SulfurRef1")[1])
-	SulfurRef2 = component.proxy(component.findComponent("SulfurRef2")[1])
-	SulfurRef3 = component.proxy(component.findComponent("SulfurRef3")[1])
-	SulfurRef4 = component.proxy(component.findComponent("SulfurRef4")[1])
-	SulfurRef5 = component.proxy(component.findComponent("SulfurRef5")[1])
-
-	TankSulfuricAcid = component.proxy(component.findComponent("TankSulfuricAcid")[1])
-	StorageAlumCasingBlender  = component.proxy(component.findComponent("StorageAlumCasingBlender")[1])
-
-	BlenderBat1 = component.proxy(component.findComponent("BlenderBat1")[1])
-	BlenderBat2 = component.proxy(component.findComponent("BlenderBat2")[1])
-	BlenderBat3 = component.proxy(component.findComponent("BlenderBat3")[1])
-
-	BlenderBat21 = component.proxy(component.findComponent("BlenderBat21")[1])
-	BlenderBat22 = component.proxy(component.findComponent("BlenderBat22")[1])
-	BlenderBat23 = component.proxy(component.findComponent("BlenderBat23")[1])
-
-	StorageBattery = component.proxy(component.findComponent("StorageBattery")[1])
-	TankWaterBlender = component.proxy(component.findComponent("TankWaterBlender")[1])
-
-	RefAlumSol21 = component.proxy(component.findComponent("RefAlumSol21")[1])
-	RefAlumSol22 = component.proxy(component.findComponent("RefAlumSol22")[1])
-	RefAlumSol23 = component.proxy(component.findComponent("RefAlumSol23")[1])
-	RefAlumSol24 = component.proxy(component.findComponent("RefAlumSol24")[1])
-	RefAlumSol25 = component.proxy(component.findComponent("RefAlumSol25")[1])
-
-	AlumSolTank2Small = component.proxy(component.findComponent("AlumSolTank2Small")[1])
-	AlumSolTank2Large = component.proxy(component.findComponent("AlumSolTank2Large")[1])
-
-	DronePortBattery = component.proxy(component.findComponent("DronePortBattery")[1])
-
-	-- setup gpu
-	gpu:bindScreen(screen)
-	w,h = gpu:getSize()
-
-	PrintDebugInfo("GPU: " .. tostring(gpu) .. "; Screen: " .. tostring(screen), debug)
-end
-	
-function ReadFileFromGithub(pathToFile, debug)
-	setupDebug = debug
-	-- get library from internet
-	PrintDebugInfo("Loading file: " .. pathToFile, debug)
-	
-	local req = card:request(pathToFile, "GET", "")
-	local _, libdata = req:await()
-
-	local fileName = removeUpToLastSlash(pathToFile)	
-	
-	-- save library to filesystem
-	filesystem.initFileSystem("/dev")
-	filesystem.makeFileSystem("tmpfs", "tmp")
-	filesystem.mount("/dev/tmp","/")
-	local file = filesystem.open(fileName, "w")
-	file:write(libdata)
-	file:close()
-
-	-- load the library from the file system and use it
-	local json = filesystem.doFile(fileName)
-	PrintDebugInfo("File loaded successfully: " .. fileName, debug)
-end
-
-function removeUpToLastSlash(inputString)
-    -- Find the position of the last "/"
-    local lastSlashPosition = inputString:match(".*()/")
-    
-    if lastSlashPosition then
-        -- Return the substring after the last "/"
-        return inputString:sub(lastSlashPosition + 1)
-    else
-        -- If no "/" is found, return the original string
-        return inputString
+    if debug == true then
+        print(message)
     end
 end
 
+-------------------------------------------------------
+-- Mount Disk (Modern FN safe)
+-------------------------------------------------------
+function InitDrive()
 
+    fs.initFileSystem("/dev")  -- do NOT check return
+
+    for _, drive in pairs(fs.children("/dev")) do
+        disk_uuid = drive
+        break
+    end
+
+    if not disk_uuid then
+        computer.panic("No disk found in /dev")
+    end
+
+    fs.mount("/dev/" .. disk_uuid, "/")
+end
+
+-------------------------------------------------------
+-- Safe Component Loader
+-------------------------------------------------------
+function LoadComponent(componentName)
+    local found = component.findComponent(componentName)
+    if not found or not found[1] then
+        computer.panic("Component not found: " .. componentName)
+    end
+    return component.proxy(found[1])
+end
+
+-------------------------------------------------------
+-- Initialization
+-------------------------------------------------------
+function Initialization(debug)
+
+    gpu = computer.getPCIDevices(classes.GPUT1)[1]
+    if not gpu then
+        computer.panic("GPU not found")
+    end
+
+    screen = LoadComponent("Screen2")
+
+    WaterStorageSulfur = LoadComponent("WaterStorageSulfur")
+    StorageSulfur = LoadComponent("StorageSulfur")
+
+    SulfurRef1 = LoadComponent("SulfurRef1")
+    SulfurRef2 = LoadComponent("SulfurRef2")
+    SulfurRef3 = LoadComponent("SulfurRef3")
+    SulfurRef4 = LoadComponent("SulfurRef4")
+    SulfurRef5 = LoadComponent("SulfurRef5")
+
+    TankSulfuricAcid = LoadComponent("TankSulfuricAcid")
+    StorageAlumCasingBlender = LoadComponent("StorageAlumCasingBlender")
+
+    BlenderBat1 = LoadComponent("BlenderBat1")
+    BlenderBat2 = LoadComponent("BlenderBat2")
+    BlenderBat3 = LoadComponent("BlenderBat3")
+
+    BlenderBat21 = LoadComponent("BlenderBat21")
+    BlenderBat22 = LoadComponent("BlenderBat22")
+    BlenderBat23 = LoadComponent("BlenderBat23")
+
+    StorageBattery = LoadComponent("StorageBattery")
+    TankWaterBlender = LoadComponent("TankWaterBlender")
+
+    RefAlumSol21 = LoadComponent("RefAlumSol21")
+    RefAlumSol22 = LoadComponent("RefAlumSol22")
+    RefAlumSol23 = LoadComponent("RefAlumSol23")
+    RefAlumSol24 = LoadComponent("RefAlumSol24")
+    RefAlumSol25 = LoadComponent("RefAlumSol25")
+
+    AlumSolTank2Small = LoadComponent("AlumSolTank2Small")
+    AlumSolTank2Large = LoadComponent("AlumSolTank2Large")
+
+    DronePortBattery = LoadComponent("DronePortBattery")
+
+    gpu:bindScreen(screen)
+    w, h = gpu:getSize()
+
+    PrintDebugInfo("GPU and Screen initialized", debug)
+end
+
+-------------------------------------------------------
+-- Helper
+-------------------------------------------------------
+function removeUpToLastSlash(inputString)
+    local lastSlashPosition = inputString:match(".*()/")
+    if lastSlashPosition then
+        return inputString:sub(lastSlashPosition + 1)
+    end
+    return inputString
+end
+
+-------------------------------------------------------
+-- Download + Execute File (Modern FN safe)
+-------------------------------------------------------
+function ReadFileFromGithub(pathToFile, debug)
+
+    PrintDebugInfo("Loading file: " .. pathToFile, debug)
+
+    if not card then
+        card = computer.getPCIDevices(classes.FINInternetCard)[1]
+        if not card then
+            computer.panic("No Internet Card found")
+        end
+    end
+
+    local req = card:request(pathToFile, "GET", "")
+    local _, libdata = req:await()
+
+    if not libdata then
+        PrintDebugInfo("Download failed: " .. pathToFile, debug)
+        return
+    end
+
+    local fileName = removeUpToLastSlash(pathToFile)
+
+    local file = fs.open(fileName, "w")
+    file:write(libdata)
+    file:close()
+
+    fs.doFile(fileName)
+
+    PrintDebugInfo("Loaded: " .. fileName, debug)
+end
+
+-------------------------------------------------------
+-- Load Modules
+-------------------------------------------------------
 function LoadFiles(debug)
-	--loading and executing all LUA files
-	ReadFileFromGithub("http://localhost/LuaCode/AlumFactory2/globalVariables.lua", debug)
-	ReadFileFromGithub("http://localhost/LuaCode/CommonFunctions/ScreenFunctions.lua", debug)
-	ReadFileFromGithub("http://localhost/LuaCode/AlumFactory2/ReportTemplate.lua", debug)
-	ReadFileFromGithub("http://localhost/LuaCode/CommonFunctions/StorageContainerInfo.lua", debug)
-	ReadFileFromGithub("http://localhost/LuaCode/CommonFunctions/MachineProgress.lua", debug)
-	ReadFileFromGithub("http://localhost/LuaCode/CommonFunctions/FluidStorage.lua", debug)		
-		
-	ReadFileFromGithub("http://localhost/LuaCode/AlumFactory2/MainLoop.lua", debug)	
-end	
+
+    InitDrive()  -- mount disk once
+
+    ReadFileFromGithub("http://192.168.10.106/LuaCode/AlumFactory2/globalVariables.lua", debug)
+    ReadFileFromGithub("http://192.168.10.106/LuaCode/CommonFunctions/ScreenFunctions.lua", debug)
+    ReadFileFromGithub("http://192.168.10.106/LuaCode/AlumFactory2/ReportTemplate.lua", debug)
+    ReadFileFromGithub("http://192.168.10.106/LuaCode/CommonFunctions/StorageContainerInfo.lua", debug)
+    ReadFileFromGithub("http://192.168.10.106/LuaCode/CommonFunctions/MachineProgress.lua", debug)
+    ReadFileFromGithub("http://192.168.10.106/LuaCode/CommonFunctions/FluidStorage.lua", debug)
+    ReadFileFromGithub("http://192.168.10.106/LuaCode/AlumFactory2/MainLoop.lua", debug)
+end

@@ -63,3 +63,10 @@ function ShowStorageInfo(x, y, storageContainer, type)
 
     return totalCount
 end
+
+
+function GetStorageInfo(storageContainer, type)
+    local itemsInFirstCell, totalCount, fillPercent = GetMaxItemsForOneStorageCell(storageContainer, type)
+
+    return totalCount
+end
