@@ -1,52 +1,131 @@
-function DoLoop()
+function LocalTime()
+  local hour = string.format("%02d", math.floor((computer.time()/60/60) % 24))
+  local minute = string.format("%02d", math.floor((computer.time()/60) % 60))
+  return hour .. ":" .. minute
+end
 
-	while true do		
+function DoLoop()	
+	while true do					
 		rubberBuffer = GetStorageInfo(StorageBuffer_Rubber, "large")
 		plasticBuffer = GetStorageInfo(StorageBuffer_Plastic, "large")
-		
-		panelBufferStatus.text = "Rubber: " .. tostring(rubberBuffer) .. 
-			"\nPlastic: ".. plasticBuffer
+					
+		for i = 1, 8 do
+			recipesInCells[i] = refineries[i][1]:getRecipe()		
+		end
 			
-		recipeCell1 = refineries[1][1]:getRecipe()		
-		recipeCell2 = refineries[2][1]:getRecipe()
-		recipeCell3 = refineries[3][1]:getRecipe()
-		recipeCell4 = refineries[4][1]:getRecipe()
-		
 		if (standByMode == true) then
 			panelProdStatus.text = "STANDBY MODE\n" 
 		else	
-			panelProdStatus.text = "Cell 1: " .. recipeCell1.name .. "\n" ..
-			"Cell 2: " .. recipeCell2.name .. "\n" ..
-			"Cell 3: " .. recipeCell3.name .. "\n" ..
-			"Cell 4: " .. recipeCell4.name		
+			panelProdStatus.text = 
+				"Cell 1: " .. recipesInCells[1].name .. " Cell 2: " .. recipesInCells[2].name .. 	"\n" ..
+				"Cell 3: " .. recipesInCells[3].name .. " Cell 4: " .. recipesInCells[4].name .. 	"\n" ..
+				"Cell 5: " .. recipesInCells[5].name .. " Cell 6: " .. recipesInCells[6].name .. 	"\n" ..
+				"Cell 7: " .. recipesInCells[7].name .. " Cell 8: " .. recipesInCells[8].name .. 	"\n"
 		end
 		
 		-- MANUAL MODE plastic
 		if (manualProdSetting.state == false and manualProduction == 2 and autoManulSwtich.state == true) then
 			manualProduction = 1			
 			StartStopMachines(false)
-			for x = 1, 5 do
-				refineries[1][x]:setRecipe(recipes[1])
-				refineries[2][x]:setRecipe(recipes[1])
-				refineries[3][x]:setRecipe(recipes[1])
-				refineries[4][x]:setRecipe(recipes[1])
-			end		
-			print("Manul changing to plastic")
+			for i = 1, 8 do
+				for x = 1, 5 do								
+					refineries[i][x]:setRecipe(recipes[1])
+				end		
+			end
+			Log("Manual changing to plastic")
 		end
 
 		-- MANUAL MODE rubber
 		if (manualProdSetting.state == true and manualProduction == 1 and autoManulSwtich.state == true) then
 			manualProduction = 2
 			StartStopMachines(false)
-			for x = 1, 5 do
-				refineries[1][x]:setRecipe(recipes[2])
-				refineries[2][x]:setRecipe(recipes[2])
-				refineries[3][x]:setRecipe(recipes[2])
-				refineries[4][x]:setRecipe(recipes[2])
+			for i = 1, 8 do
+				for x = 1, 5 do								
+					refineries[i][x]:setRecipe(recipes[2])
+				end		
 			end
-			print("Manul changing to rubber")
-		end
+			Log("Manual changing to rubber")
+		end		
 		
+		--automatic mode
+		if (autoManulSwtich.state == false) then
+			-- we have nothing, produce both
+			if (rubberBuffer < 500 and plasticBuffer < 500) then
+				Log("Auto. 1-4 Plastic, 5-8 rubber")
+
+				if standByMode == true then
+					StartStopMachines(false)
+				end
+
+				for i = 1, 4 do
+					for x = 1, 5 do                                        
+						if (recipesInCells[i].name ~= "Plastic") then 
+							refineries[i][x]:setRecipe(recipes[1]) -- plastic
+						end
+					end
+				end
+
+				for i = 5, 8 do
+					for x = 1, 5 do										
+						if (recipesInCells[i].name ~= "Rubber") then 
+							refineries[i][x]:setRecipe(recipes[2]) -- rubber
+						end						
+					end
+				end				
+			end
+
+			if (rubberBuffer > 250 and plasticBuffer < 100) then
+				-- produce only plastic				
+				
+				if standByMode == true then
+					StartStopMachines(false)
+				end
+
+				for i = 1, 8 do
+					for x = 1, 5 do				
+						if (recipesInCells[i].name ~= "Plastic") then 	
+							Log("Auto. Changing ALL to plastic")											
+							refineries[i][x]:setRecipe(recipes[1]) -- plastic
+						end
+					end
+				end			
+			end
+
+			if (rubberBuffer < 100 and plasticBuffer > 250) then
+				-- produce only rubber				
+				if standByMode == true then
+					StartStopMachines(false)
+				end
+
+				for i = 1, 8 do
+					for x = 1, 5 do				
+						if (recipesInCells[i].name ~= "Rubber") then 												
+							Log("Auto. Changing ALL to Rubber")
+							refineries[i][x]:setRecipe(recipes[2]) -- rubber
+						end
+					end
+				end	
+			end	
+			
+			if (rubberBuffer > 1000 and plasticBuffer > 1000 and standByMode == false) then				
+				StartStopMachines(true)
+			end
+		end	
+		
+		x1 = FluidStorage(0, 0, HeavyOilStorageSmall, "small")
+		x2 = FluidStorage(0, 0, Storage_HeaveOil2, "small")
+		x3 = FluidStorage(0, 0, Storage_HeaveOil3, "small")		
+	
+		SetGaugePercent(heavyOilTank, x1)
+		SetGaugePercent(heavyOilTank2, x2)
+		SetGaugePercent(heavyOilTank3, x3)
+			
+		f1 = FluidStorage(0, 0, FuelTank1, "large")
+		f2 = FluidStorage(0, 0, FuelTank2, "large")				
+
+		SetGaugePercent(fuelTankGauge2, f1)
+		SetGaugePercent(fuelTankGauge1, f2)
+
 		if (autoManulSwtich.state == false) then
 			autoLight:setColor(0, 1, 0, 1) -- green
 			manualLight:setColor(1, 0, 0, 1) -- red
@@ -54,103 +133,12 @@ function DoLoop()
 			autoLight:setColor(1, 0, 0, 1) -- red
 			manualLight:setColor(0, 1, 0, 1) -- green
 		end
-		
-		--automatic mode
-		if (autoManulSwtich.state == false) then
-			-- we have nothing, produce both
-			if (rubberBuffer < 500 and plasticBuffer < 500) then
-				if standByMode == true then
-					StartStopMachines(false)
-				end
 
-				for x = 1, 5 do				
-					if (recipeCell1.name ~= "Plastic") then 						
-						print("Nothing. Changing cell1 to plastic");
-						refineries[1][x]:setRecipe(recipes[1]) -- plastic
-					end
-					if (recipeCell2.name ~= "Plastic") then				
-						print("Nothing. Changing cell2 to plastic");				
-						refineries[2][x]:setRecipe(recipes[1]) -- plastic
-					end
-					if (recipeCell3.name ~= "Rubber") then						
-						print("Nothing. Changing cell3 to Rubber");				
-						refineries[3][x]:setRecipe(recipes[2]) -- rubber
-					end
-					if (recipeCell3.name ~= "Rubber") then						
-						print("Nothing. Changing cell4 to Rubber");				
-						refineries[4][x]:setRecipe(recipes[2]) -- rubber
-					end
-				end
-			end
+		panelBufferStatus.text = "Rubber: " .. tostring(rubberBuffer) .. 
+			"\nPlastic: ".. plasticBuffer ..
+			"\n" .. lastLog ..
+			"\n" .. "Time: " .. LocalTime()
 
-
-			if (rubberBuffer > 500 and plasticBuffer < 100) then
-				-- produce only plastic
-				if standByMode == true then
-					StartStopMachines(false)
-				end
-
-				for x = 1, 5 do				
-					if (recipeCell1.name ~= "Plastic") then 						
-						print("Too much rubber.Changing cell1 to plastic");
-						refineries[1][x]:setRecipe(recipes[1]) -- plastic
-					end
-					if (recipeCell2.name ~= "Plastic") then				
-						print("Too much rubber.Changing cell2 to plastic");				
-						refineries[2][x]:setRecipe(recipes[1]) -- plastic
-					end
-					if (recipeCell3.name ~= "Plastic") then						
-						print("Too much rubber.Changing cell3 to Plastic");				
-						refineries[3][x]:setRecipe(recipes[1]) -- Plastic
-					end
-					if (recipeCell3.name ~= "Plastic") then						
-						print("Too much rubber.Changing cell4 to Plastic");				
-						refineries[4][x]:setRecipe(recipes[1]) -- Plastic
-					end
-				end
-			end
-
-			if (rubberBuffer < 100 and plasticBuffer > 500) then
-				-- produce only rubber
-				if standByMode == true then
-					StartStopMachines(false)
-				end
-
-				for x = 1, 5 do				
-					if (recipeCell1.name ~= "Rubber") then 						
-						print("Too much plastic. Changing cell1 to Rubber");
-						refineries[1][x]:setRecipe(recipes[2]) -- Rubber
-					end
-					if (recipeCell2.name ~= "Rubber") then				
-						print("Too much plastic. Changing cell2 to Rubber");				
-						refineries[2][x]:setRecipe(recipes[2]) -- Rubber
-					end
-					if (recipeCell3.name ~= "Rubber") then						
-						print("Too much plastic. Changing cell3 to Rubber");				
-						refineries[3][x]:setRecipe(recipes[2]) -- Rubber
-					end
-					if (recipeCell3.name ~= "Rubber") then						
-						print("Too much plastic. Changing cell4 to Rubber");				
-						refineries[4][x]:setRecipe(recipes[2]) -- Rubber
-					end
-				end
-			end	
-			
-			if (rubberBuffer > 1000 and plasticBuffer > 1000 and standByMode == false) then
-				print("We have enough of both. Stopping production")				
-				StartStopMachines(true)
-			end
-		end	
-		
-		x1 = FluidStorage(0, 0, HeavyOilStorageSmall, "small")
-		x2 = FluidStorage(0, 0, Storage_HeaveOil2, "small")
-
-		heavyOilTank2.limit = 0.8
-		heavyOilTank.limit = 0.8 
-		
-		heavyOilTank.percent = x1/100
-		heavyOilTank2.percent = x2/100
-			
 		event.pull(1)			
 	end
 end

@@ -1,5 +1,3 @@
-WaterTankArray = {}
-numberOfWaterTanks = 5
 
 indicators = {}
 switches = {}

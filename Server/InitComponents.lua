@@ -150,7 +150,8 @@ function openPorts(debug)
     netcard:open(1126) -- Thermal Propulsion Rocket
     netcard:open(1127) -- Computer 2
     netcard:open(1128) -- Computer 3
-    
+    netcard:open(1129) -- Radio Control Unit 2
+    netcard:open(1130) -- Sam Fluctuator
 end
 
 

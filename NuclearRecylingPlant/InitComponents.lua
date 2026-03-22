@@ -48,54 +48,59 @@ end
 -------------------------------------------------------
 -- Initialization
 -------------------------------------------------------
-function Initialization(debug)
-    PrintDebugInfo("numberOfReactors: " .. numberOfWaterTanks, debug)
+function Initialization(debug)    
+    gpu = computer.getPCIDevices(classes.GPUT1)[1]   
+    
+	--screen = LoadComponent("NR_ScreenOnSite", debug)        
+	screen = LoadComponent("NR_Screen_ControlRoom", debug)        
 
-    gpu = computer.getPCIDevices(classes.GPUT1)[1]
+	NR_SulfuricAcid1 = LoadComponent("NR_SulfuricAcid1", debug)        
+	NR_NitricAcid1 = LoadComponent("NR_NitricAcid1", debug)        
+	NR_UraniumWaste_Blender1 = LoadComponent("NR_UraniumWaste_Blender1", debug)        
+	NR_Silicon_Blender1 = LoadComponent("NR_Silicon_Blender1", debug)        
+	NR_NonFisUranium_Blender1 = LoadComponent("NR_NonFisUranium_Blender1", debug)        
+	NR_WaterTank_Blender1 = LoadComponent("NR_WaterTank_Blender1", debug)        
 
-    --Change here for server / on site
-    --screen = LoadComponent("ScreenOnSite", debug)            
-    --panel = LoadComponent("PanelOnSite", debug)
+	-- Arc reactor
+	NR_NuclearWaste_ArcReactor = LoadComponent("NR_NuclearWaste_ArcReactor", debug)        
+	NR_ArcReactor1 = LoadComponent("NR_ArcReactor1", debug)        
+	NR_ArcReactor2 = LoadComponent("NR_ArcReactor2", debug)
+	NR_ArcReactor3 = LoadComponent("NR_ArcReactor3", debug)
+	
+	-- Assembler
+	NR_PlutoniumPallet_Assmb = LoadComponent("NR_PlutoniumPallet_Assmb", debug)        
+	NR_Concrete_Assmb = LoadComponent("NR_Concrete_Assmb", debug)        
+	
+	-- Manufacturer 1	
+	Man1_Storage1 = LoadComponent("Man1_Storage1", debug)        
+	Man1_Storage2 = LoadComponent("Man1_Storage2", debug)        
+	Man1_Storage3 = LoadComponent("Man1_Storage3", debug)        
+	Man1_Storage4 = LoadComponent("Man1_Storage4", debug)        	
 
-    -- Control Room Screen
-    screen = LoadComponent("ControlRoomScreen", debug)        
-    panel = LoadComponent("ControlRoomPanel", debug)    
+	NR_Cell1_Man1 = LoadComponent("NR_Cell1_Man1", debug)        	
+	NR_Cell1_Man2 = LoadComponent("NR_Cell1_Man2", debug)        	
+	NR_Cell1_Man3 = LoadComponent("NR_Cell1_Man3", debug)        		 
 
-    PrintDebugInfo("panel: " .. tostring(panel), debug)
+	-- Manufacturer 2
+	Man2_Storage1 = LoadComponent("Man2_Storage1", debug)        
+	Man2_Storage2 = LoadComponent("Man2_Storage2", debug)        
+	Man2_Storage3 = LoadComponent("Man2_Storage3", debug)        
+	Man2_Storage4 = LoadComponent("Man2_Storage4", debug)        	
 
+	NR_Cell2_Man1 = LoadComponent("NR_Cell2_Man1", debug)        	
+	NR_Cell2_Man2 = LoadComponent("NR_Cell2_Man2", debug)        	
+	NR_Cell2_Man3 = LoadComponent("NR_Cell2_Man3", debug)       
 
-    FuelRodStorage = LoadComponent("FuelRodStorage", debug)
-
-    for i = 1, numberOfReactors do
-        local reactorName = "Reactor" .. tostring(i)
-        ReactorArray[i] = LoadComponent(reactorName, debug)
-    end
-
-    for i = 1, numberOfWaterTanks do
-        local waterTank = "ReactorWaterTank" .. tostring(i)        
-        WaterTankArray[i] = LoadComponent(waterTank, debug)
-    end
-
-
-
-
---    WaterTankReactor = LoadComponent("WaterTankReactor", debug)
---    WaterTank2 = LoadComponent("WaterTank2", debug)
-    PowerInfo = LoadComponent("PowerInfo", debug)
---    NuclearWasteStorage = LoadComponent("NuclearWasteStorage", debug)
-
-    dsp1 = panel:getModule(2, 9, 0)
-    dsp2 = panel:getModule(3, 9, 0)
-    dsp3 = panel:getModule(4, 9, 0)
-    dsp4 = panel:getModule(5, 9, 0)
-
-    --modular = LoadComponent("ModularIndicatorPole", debug)
+	-- Finished goods
+	
+	NR_FinishedFuelRod = LoadComponent("NR_FinishedFuelRod", debug)        	
 
     gpu:bindScreen(screen)
     w, h = gpu:getSize()
 
     PrintDebugInfo("GPU: " .. tostring(gpu) .. "; Screen: " .. tostring(screen), debug)
 
+    PowerInfo = LoadComponent("PowerInfo", debug)
     con = PowerInfo:getPowerConnectors()[1]
     circuit = con:getCircuit()
 
@@ -154,16 +159,13 @@ function LoadFiles(debug)
 
     InitDrive()  -- mount disk ONCE
     ReadFileFromGithub("http://192.168.10.106/LuaCode/CommonFunctions/StorageContainerInfo.lua", debug)
-    ReadFileFromGithub("http://192.168.10.106/LuaCode/UraniumPowerPlant/globalVariables.lua", debug)
     ReadFileFromGithub("http://192.168.10.106/LuaCode/CommonFunctions/ScreenFunctions.lua", debug)
-    ReadFileFromGithub("http://192.168.10.106/LuaCode/UraniumPowerPlant/PowerInfo.lua", debug)
-    ReadFileFromGithub("http://192.168.10.106/LuaCode/UraniumPowerPlant/ReportTemplate.lua", debug)    
     ReadFileFromGithub("http://192.168.10.106/LuaCode/CommonFunctions/MachineProgress.lua", debug)
     ReadFileFromGithub("http://192.168.10.106/LuaCode/CommonFunctions/FluidStorage.lua", debug)
     ReadFileFromGithub("http://192.168.10.106/LuaCode/CommonFunctions/GeneralInfo.lua", debug)
-    ReadFileFromGithub("http://192.168.10.106/LuaCode/UraniumPowerPlant/Indicators.lua", debug)
-    ReadFileFromGithub("http://192.168.10.106/LuaCode/UraniumPowerPlant/MainLoop.lua", debug)
-    
-    --ReadFileFromGithub("http://192.168.10.106/LuaCode/UraniumPowerPlant/WebAppDataSender.lua", debug)
-    --ReadFileFromGithub("http://192.168.10.106/LuaCode/UraniumPowerPlant/FileDataSender.lua", debug)
+	ReadFileFromGithub("http://192.168.10.106/LuaCode/CommonFunctions/PowerInfo.lua", debug)	
+	
+	ReadFileFromGithub("http://192.168.10.106/LuaCode/NuclearRecylingPlant/globalVariables.lua", debug)
+	ReadFileFromGithub("http://192.168.10.106/LuaCode/NuclearRecylingPlant/MainLoop.lua", debug)
+	ReadFileFromGithub("http://192.168.10.106/LuaCode/NuclearRecylingPlant/ReportTemplate.lua", debug)
 end

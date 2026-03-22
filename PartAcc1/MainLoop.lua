@@ -85,7 +85,7 @@ function DoLoop()
 		print("remaining: " .. tostring(remaining))
 
 		panelStatus.text = "Producing... \n" .. 
-			tostring(itemsInStockToFinishProduction) .. " items to produce"	..
+			tostring(itemsInStockToFinishProduction) .. " items to finish production."	..
 			"\n" .. tostring(remaining) .. " items remaining"
 	end
 

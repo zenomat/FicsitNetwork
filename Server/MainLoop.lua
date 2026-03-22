@@ -98,6 +98,17 @@ function DoWhenSensorActive()
 		   ShowManufacturerInfo(50, 19, message)		   		   
 	   end
 
+	   if (port == 1129) then 
+		   -- Radio Control Unit 2
+		   --print("Computer2 .. " .. message)
+		   ShowManufacturerInfo(50, 20, message)		   		   
+	   end
+
+	   if (port == 1130) then 
+		   -- Sam Fluctuator		   
+		   ShowManufacturerInfo(50, 21, message)		   		   
+	   end
+
 
 	   if (port == 3000) then 
 			-- test machine

@@ -53,3 +53,8 @@ function padRight(str, width)
         return str
     end
 end
+
+function Log(message)
+	lastLog =  LocalTime() .. ": " .. message
+	print(lastLog)	
+end

@@ -28,8 +28,9 @@ function ReactorStatus(x, y, machine)
 end
 
 function MachineProgress(x, y, machine)
-	if (machine ~= nill) then	
-		ShowMsg(x, y, machine.progress * 100) 
+	if (machine ~= nill) then		
+	
+		ShowMsg(x, y, string.format("%.2f%%", machine.progress * 100))
 	else
 		ShowMsg(x, y, "?")
 	end

@@ -1,10 +1,9 @@
 local fs = filesystem
 local serverOnLine = false
 debugMode = true
+
 local card = nil
 local disk_uuid = nil
-
-local initComponentsURL = "http://192.168.10.106/LuaCode/UraniumPowerPlant/InitComponents.lua"
 
 -------------------------------------------------------
 -- Mount disk
@@ -38,7 +37,7 @@ function LoadInitializationFile()
     end
 
     local req = card:request(
-        initComponentsURL,
+        "http://192.168.10.106/LuaCode/UraniumPowerPlant/InitComponents.lua",
         "GET",
         ""
     )
@@ -80,5 +79,5 @@ end
 
 
 while serverOnLine do
-    DoLoop()
+	DoLoop()
 end

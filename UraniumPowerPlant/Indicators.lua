@@ -23,7 +23,10 @@ end
 -- Test
 -------------------------------------------------------
 function ColorTestGroup1()
-    for i = 1, 4 do
+    print("Testing indicators ...")
+    for i = 1, 6 do
+        print(indicators[i])
+        
         indicators[i]:setColor(0, 1, 0, 1)
         event.pull(0.5)
 
@@ -41,12 +44,7 @@ end
 -- Load indicators
 -------------------------------------------------------
 function LoadIndicators()
-	PrintDebugInfo("Loading indicators...", true)		
-
-    indicators = {}
-    switches = {}
-    manualControlSwitch= {}
-    
+	PrintDebugInfo("Loading indicators...", true)		    
 
     local moduleIndex = 1
     for x = 2, 7 do

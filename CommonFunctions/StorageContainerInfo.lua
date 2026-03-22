@@ -49,20 +49,45 @@ function ShowStorageInfo(x, y, storageContainer, type)
     local itemsInFirstCell, totalCount, fillPercent =
         GetMaxItemsForOneStorageCell(storageContainer, type)
 
-    local label = string.format("%.2f", fillPercent) .. " %   "
+    local label = string.format("%.2f", fillPercent) .. " %     "
 
     if fillPercent > 50 and fillPercent < 100 then
         ShowMsg(x, y, label, "green")
     elseif fillPercent > 15 and fillPercent <= 50 then
         ShowMsg(x, y, label, "yellow")
     elseif fillPercent == 100 then
-        ShowMsg(x, y, "FULL", "green")
+        ShowMsg(x, y, "FULL    ", "green")
     else
         ShowMsg(x, y, label, "red")
     end
 
     return totalCount
 end
+
+
+function ShowStorageInfoValue(x, y, storageContainer, type)
+    local itemsInFirstCell, totalCount, fillPercent =
+        GetMaxItemsForOneStorageCell(storageContainer, type)		
+		
+	if (totalCount == nil) then
+		totalCount = 0
+	end
+
+    local label = tostring(totalCount)
+
+    if fillPercent > 50 and fillPercent < 100 then
+        ShowMsg(x, y, label, "green")
+    elseif fillPercent > 15 and fillPercent <= 50 then
+        ShowMsg(x, y, label, "yellow")
+    elseif fillPercent == 100 then
+        ShowMsg(x, y, "FULL    ", "green")
+    else
+        ShowMsg(x, y, label, "red")
+    end
+
+    return totalCount
+end
+
 
 
 function GetStorageInfo(storageContainer, type)

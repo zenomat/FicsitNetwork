@@ -2,6 +2,8 @@ local fs = filesystem
 local card = nil
 local disk_uuid = nil
 
+onSite = true
+
 -------------------------------------------------------
 -- Debug
 -------------------------------------------------------
@@ -68,67 +70,49 @@ end
 -- Initialization
 -------------------------------------------------------
 function Initialization(debug)
-    print(debug)
-    -- Init Components
+    AlumSolSmall = LoadComponent("AlumSolSmall", debug)
+    AlumSol2Small = LoadComponent("AlumSol2Small", debug)
+    WaterSmall = LoadComponent("WaterSmall", debug)
+    Water2Small = LoadComponent("Water2Small", debug)
+    Splitter_Silica1 = LoadComponent("Splitter_Silica1", debug)
+    Splitter_Silica2 = LoadComponent("Splitter_Silica2", debug)    
+    Storage_Silica1 = LoadComponent("Storage_Silica1", debug)
+    Storage_Silica2 = LoadComponent("Storage_Silica2", debug)
 
-    StorageBuffer_Rubber = LoadComponent("StorageBuffer_Rubber", debug)
-    StorageBuffer_Plastic = LoadComponent("StorageBuffer_Plastic", debug)
-    HeavyOilStorageSmall = LoadComponent("Storage_HeaveOil", debug)
-    Storage_HeaveOil2 = LoadComponent("Storage_HeaveOil2", debug)
-    Storage_HeaveOil3 = LoadComponent("Storage_HeaveOil3", debug)
-    
-    FuelTank1 = LoadComponent("FuelTank1", debug)
-    FuelTank2 = LoadComponent("FuelTank2", debug)
+	--Line2
+	L2_StorageScrap = LoadComponent("L2_StorageScrap", debug)
+	L2_StorageSilica = LoadComponent("L2_StorageSilica", debug)
+	L2_PowerSwitch = LoadComponent("L2_PowerSwitch", debug)
+	AlumIgnotStorage = LoadComponent("AlumIgnotStorage", debug)
 
-    sign = LoadComponent("Display1", debug)
-    print(sign)
+    panel = LoadComponent("Panel_OnSite", debug) -- panel at server room
 
-    for i = 1, 8 do
-        LoadRefineries(i, debug)
-    end
+    -- AlumiumSol Tank gauges (top row)
+    alumSolGauge1  = panel:getModule(3, 9, 0)
+    alumSolGauge2  = panel:getModule(4, 9, 0)
 
-    -- Panels and buttonsc
-    --panel = LoadComponent("Panel1", debug) -- panel at site
-    panel = LoadComponent("PanelSeverRoom", debug) -- panel at server room
+    -- Water Tank gauges (second row)
+    waterGauge1    = panel:getModule(3, 8, 0)
+    waterGauge2    = panel:getModule(4, 8, 0)
 
-    -- Panel modules
-    panelBufferStatus = panel:getModule(3, 9, 0)
-    panelBufferStatus.size = 20
-    panelProdStatus = panel:getModule(3, 7, 0)
-    panelProdStatus.size = 20
+    -- Silica Storage displays
+    silicaStorageInfo = panel:getModule(3, 5, 0)
 
-    manualProdSetting = panel:getModule(3, 4, 0)
-    autoManulSwtich = panel:getModule(3, 5, 0)
-    autoLight = panel:getModule(0, 5, 0)
-    manualLight = panel:getModule(6, 5, 0)
+    -- Splitter knobs
+    splitter1Indicator  = panel:getModule(2, 4, 0)
+    splitter2Indicator  = panel:getModule(3, 4, 0)    
 
-    heavyOilTank = panel:getModule(9, 9, 0)
-    heavyOilTank2 = panel:getModule(9, 7, 0)
-    heavyOilTank3 = panel:getModule(7, 7, 0)
-	
-    fuelTankGauge1 = panel:getModule(7, 4, 0)
-    fuelTankGauge2 = panel:getModule(9, 4, 0)
+	--Line 2 text
+	line2Info = panel:getModule(7, 8, 0)
 
-    heavyOilTank.limit = 0.8 
-    heavyOilTank2.limit = 0.8
-    heavyOilTank3.limit = 0.8
-    fuelTankGauge1.limit = 0.8
-    fuelTankGauge2.limit = 0.8
+    SetGaugeLimit(alumSolGauge1, 0.8)
+    SetGaugeLimit(alumSolGauge2, 0.8)
+    SetGaugeLimit(waterGauge1, 0.8)
+    SetGaugeLimit(waterGauge2, 0.8)
+    silicaStorageInfo.size = 25
+	line2Info.size = 25
 
-    -- Load all recipes from a refinery. 1 = plastic; 2 = Rubber
-    print("Loading recipes")
-
-    print(refineries[1][1])
-
-    recipes = refineries[1][1]:getRecipes()    
-
-    manualProduction = 1 -- 1 = plastic, 2 = rubber
-    
-    --start with machines ON
-    StartStopMachines(false)
-
-    Log("Started...");
-
+    PrintDebugInfo("Initialization complete", debug)
 end
 
 -------------------------------------------------------
@@ -186,11 +170,9 @@ function LoadFiles(debug)
     ReadFileFromGithub("http://192.168.10.106/LuaCode/CommonFunctions/StorageContainerInfo.lua", debug)    
     ReadFileFromGithub("http://192.168.10.106/LuaCode/CommonFunctions/ScreenFunctions.lua", debug)
     ReadFileFromGithub("http://192.168.10.106/LuaCode/CommonFunctions/Gauges.lua", debug)
-
-    ReadFileFromGithub("http://192.168.10.106/LuaCode/PlasticRubber/globalVariables.lua", debug)    
-    ReadFileFromGithub("http://192.168.10.106/LuaCode/PlasticRubber/MainLoop.lua", debug)    
-    ReadFileFromGithub("http://192.168.10.106/LuaCode/PlasticRubber/Standby.lua", debug)
    
+    ReadFileFromGithub("http://192.168.10.106/LuaCode/AlumFactory3/OnSite/InitComponents.lua", debug)
+    ReadFileFromGithub("http://192.168.10.106/LuaCode/AlumFactory3/OnSite/MainLoop.lua", debug)
 end
 
 
